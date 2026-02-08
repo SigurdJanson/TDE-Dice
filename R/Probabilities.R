@@ -68,3 +68,25 @@ pAttr <- function(eav) {
     )
   )
 }
+#
+# SKILLS ###################
+#
+
+#' The density function for rolling a sum of 3d20.
+#' @param x A vector of dice sums.
+#' @value The vector starts with indices 1 and 2, both of which are zero because
+#' 3d20 has a sum of at least 3.
+d3D20 <- function(x) {
+  p <- c(0, 0, 1, 3, 6, 10, 15, 21, 28,
+         36, 45, 55, 66, 78, 91, 105, 120, 136, 153,
+         171, 190, 210, 228, 244, 258, 270, 280, 288, 294,
+         298, 300, 300, 298, 294, 288, 280, 270, 258, 244,
+         228, 210, 190, 171, 153, 136, 120, 105, 91, 78,
+         66, 55, 45, 36, 28, 21, 15, 10, 6, 3, 1)
+
+  if (missing(x)) return(p)
+
+  x[x < 3L | x > 60L] <- 1L # handle indices of p that are out of range
+  return(p[x] / 8000)
+}
+
