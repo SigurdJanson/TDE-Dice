@@ -1,0 +1,19 @@
+Package: TDEDice
+Type: Package
+Title: Probability Distributions in the World of the Dark Eye
+Version: 0.1.0
+Authors@R: c(
+    person(
+      "Jan", "Seifert",
+      email = "github@sigurdjanson.anonaddy.com",
+      role = c("aut", "cre")
+    )
+  )
+Description: More about what it does (maybe more than one line).
+    Continuation lines should be indented.
+License: MIT Licence
+Encoding: UTF-8
+LazyData: true
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
