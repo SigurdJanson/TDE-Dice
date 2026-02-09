@@ -12,3 +12,18 @@ qualityLevel <- function(sp)
     findInterval(sp, vec = qualityLevelBreakPoints) + 1L,
     0L)
 
+
+#' Convolutes two distributions of {n}d{M}.
+convolveDice <- function(x, y) {
+  result <- integer(length(x) + length(y))
+  for (a in 1:length(x)) {
+    for (b in 1:length(y))
+    {
+      sum <- a + b
+      prob = x[a] * y[b];
+      result[sum] = result[sum] + prob;
+    }
+  }
+  return(result)
+}
+
