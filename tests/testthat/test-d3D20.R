@@ -1,5 +1,6 @@
 test_that("missing parameter returns the whole distribution", {
   expect_length(d3D20(), length(1:60))
+  expect_equal(sum(d3D20()), 1)
 })
 
 test_that("NULL parameter returns an empty set", {
