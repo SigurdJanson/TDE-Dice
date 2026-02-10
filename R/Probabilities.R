@@ -7,6 +7,27 @@
 #' It is only defined for `1 <= eav <= 20`.
 rect1d20 <- function(eav) c(rep(0L, eav-1L), eav, rep(1L, 20L - eav))
 
+crit3d20 <- function(eav) {
+  e1 <- c(rep(0, sum(eav)-1L), eav[1], rep(1, 20-eav[1]), rep(0, 40))
+  e1 <- e1[1:60]
+  e2 <- c(rep(0, sum(eav)-1L), eav[2], rep(1, 20-eav[2]), rep(0, 40))
+  e2 <- e2[1:60]
+  e3 <- c(rep(0, sum(eav)-1L), eav[3], rep(1, 20-eav[3]), rep(0, 40))
+  e3 <- e3[1:60]
+  e1[sum(eav)] <- e1[sum(eav)] -2L
+  return(e1+e2+e3)
+}
+
+botch3d20 <- function(eav) {
+  e1 <- c(rep(0, 39+eav[1]), eav[1], rep(1, 20-eav[1]))
+  e1 <- e1[1:60]
+  e2 <- c(rep(0, 39+eav[2]), eav[2], rep(1, 20-eav[2]))
+  e2 <- e2[1:60]
+  e3 <- c(rep(0, 39+eav[3]), eav[3], rep(1, 20-eav[3]))
+  e3 <- e3[1:60]
+  e1[60L] <- e1[60L] -2L
+  return(e1+e2+e3)
+}
 
 #
 # ATTRIBUTES ###################
