@@ -1,3 +1,12 @@
+#' Create a probability distribution for a d20 truncated at and
+#' rectified to `eav`.
+#' @param eav The effective attribute value of the check
+#' @returns An integer vector representing the number of events
+#' for each face from 1 to 20.
+#' @details This function does not validate it's arguments.
+#' It is only defined for `1 <= eav <= 20`.
+rect1d20 <- function(eav) c(rep(0L, eav-1L), eav, rep(1L, 20L - eav))
+
 
 #
 # ATTRIBUTES ###################
