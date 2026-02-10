@@ -124,5 +124,50 @@ d3D20 <- function(x) {
 
   x[x < 3L | x > 60L] <- 1L # handle indices of p that are out of range
   return(p[x] / 8000)
+
+
+
+#' The likelihood for success or failure when rolling a skill check.
+#' @param x A vector of dice sums.
+#' @param skills A vector with 3 places, each being an effective
+#' attribute value.
+#' @value returns a list with 4 vectors:
+#' `Critical`, `Success`, `Fail`, `Botch`.
+#' Each vector lists the probabilities for the given `x`.
+dSkill <- function(x, eav, skill) {
+  stopifnot(length(eav) == 3L)
+  stopifnot(all(eav > 0L))
+
+  # "constants"
+  maxd20 <- 20L
+  max3d20 <- 60L # "constant': the max sum of 3d20
+  totalEvents <- 8000L # "constant': number of events with 3d20
+
+  #
+  eav <- pmin(eav, maxd20)
+
+  # Create the rectified 1d20 distributions and convolute them
+  # into one distributions
+  distr <- convolveDice(rect1d20(eav[1]), rect1d20(eav[2]))
+  distr <- convolveDice(distr, rect1d20(eav[3]))
+  distr <- distr / totalEvents
+
+  distr <- distr -
+    crit3d20(eav) / 8000 -
+    botch3d20(eav) / 8000
+
+  ###maxQL <- findInterval(skill, vec = c(4, 7, 10, 13, 16)) + 1L
+  threshold <- min(sum(eav) + skill, max3d20) # separates success from failures
+  return(
+    list(
+      Critical = (3*19 + 1) / totalEvents,
+      Success = sum(distr[1:threshold]),
+      Fail = if (threshold < max3d20)
+        sum(distr[(threshold+1L):max3d20])
+      else
+        0.0,
+      Botch = (3*19 + 1) / totalEvents
+    )
+  )
 }
 
