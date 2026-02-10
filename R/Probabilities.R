@@ -114,7 +114,6 @@ d3D20 <- function(x) {
          228, 210, 190, 171, 153, 136, 120, 105, 91, 78,
          66, 55, 45, 36, 28, 21, 15, 10, 6, 3, 1)
 
-  if (missing(x)) return(p)
   if (missing(x)) return(freq / 8000)
 
   x[x < 3L | x > 60L] <- 1L # handle indices of p that are out of range
@@ -122,8 +121,6 @@ d3D20 <- function(x) {
 }
 
 
-  x[x < 3L | x > 60L] <- 1L # handle indices of p that are out of range
-  return(p[x] / 8000)
 
 
 
