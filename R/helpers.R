@@ -46,6 +46,10 @@ binSkillPoints <- function(sp) {
 
 
 
+#
+# CONVOLUTION ##################
+#
+
 #' Convolutes two distributions of {n}d{M}.
 convolveDice <- function(x, y) {
   result <- integer(length(x) + length(y))

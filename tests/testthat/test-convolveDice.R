@@ -1,3 +1,7 @@
+#
+# PAIR OF FAIR DICE ####
+#
+
 test_that("3d20", {
 expected <- c(0, 0, 1, 3, 6, 10, 15, 21, 28,
               36, 45, 55, 66, 78, 91, 105, 120, 136, 153,
@@ -20,3 +24,29 @@ test_that("2d6", {
     expected
   )
 })
+
+
+test_that("2d3", {
+  expected <- c(0, 1, 2, 3, 2, 1)
+  expect_equal(
+    convolveDice(rep(1, 3), rep(1, 3)),
+    expected
+  )
+})
+
+
+#
+# 1 is TRUNCATED RECTIFIED
+#
+
+test_that("d6 X d[3, 3, 3, 4, 5, 6]", {
+  expected <- c(0, 0, 0, 3, 4, 5,
+                6, 6, 6, 3, 2, 1)
+  expect_equal(
+    convolveDice(
+      c(0, 0, 3, rep(1, 3)),
+      rep(1, 6)),
+    expected
+  )
+})
+
