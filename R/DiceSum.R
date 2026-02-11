@@ -1,11 +1,18 @@
+
 #' Sum of dice
 #' Calculate the probability of rolling a specified number
 #' of faces with two dice.
+#' @param k The number of dice (integer, `k > 1`)
+#' @param n The number of faces of the dice (integer, `n > 1`)
+#'
 #' @details For two fair n-sided dice (faces 1..n),
 #' the sum distribution is triangular. The functions here have
 #' been tested in a value range of n ∊ [1, 100].
 #' @returns A named vector with the probabilities for each sum
 #' of dice.
+#' @export
+#'
+#' @examples
 dSumKdN <- function(k = 2L, n = 6L) {
   stopifnot(is.numeric(n), n %% 1 == 0, n >= 1L)
   stopifnot(is.numeric(k), k %% 1 == 0, k >= 1L)
@@ -42,9 +49,6 @@ dSumKdN <- function(k = 2L, n = 6L) {
 
 
 
-#' Sum of dice
-#' Calculate the probability of rolling a specified number
-#' of faces with 2 dice.
 #' @details For two fair n-sided dice (faces 1..n),
 #' the sum distribution is triangular.
 #' @describeIn sumKdN `sum2dN` is used for 2 dice because this

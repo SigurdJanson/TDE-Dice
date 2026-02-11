@@ -33,6 +33,11 @@ botch3d20 <- function(eav) {
 # ATTRIBUTES ###################
 #
 
+
+#' Determine the probability of an attribute check
+#' @describeIn pAttr Uses a brute force algorithm. It is
+#' intended for analysis purposes rather than practical use.
+#' @param eav effective attribute value
 pAttr_BF <- function(eav) {
   stopifnot(eav > 0)
 
@@ -84,8 +89,11 @@ pAttr_BF <- function(eav) {
   )
 }
 
-#' AttributeCheck
+#' Determine the probabilities for the outcomes of an attribute check
 #' @param eav effective attribute value
+#' @returns A list with 4 vectors: `Critical`, `Success`, `Fail`, `Botch`.
+#' @export
+#' @examples pAttr(12)
 pAttr <- function(eav) {
   stopifnot(eav > 0)
   eav <- pmin(eav, 19)
@@ -98,6 +106,12 @@ pAttr <- function(eav) {
     )
   )
 }
+
+
+pCombat <- function() {
+
+}
+
 #
 # SKILLS ###################
 #
@@ -106,6 +120,7 @@ pAttr <- function(eav) {
 #' @param x A vector of dice sums.
 #' @returns The vector of length 60 starts with indices 1 and 2,
 #' both of which are zero because 3d20 has a sum of at least 3.
+#' @export
 d3D20 <- function(x) {
   freq <- c(0, 0, 1, 3, 6, 10, 15, 21, 28,
          36, 45, 55, 66, 78, 91, 105, 120, 136, 153,
@@ -124,16 +139,23 @@ d3D20 <- function(x) {
 
 
 
-#' The likelihood for success or failure when rolling a skill check.
+#' The likelihood for the outcomes of a skill check.
 #' @param x A vector of dice sums.
-#' @param skills A vector with 3 places, each being an effective
 #' @param eav A vector with 3 places, each being an effective
 #' attribute value.
-#' @returns Returns a list with 4 vectors:
-#' `Critical`, `Success`, `Fail`, `Botch`.
 #' @param skill The skill value
 #' @param format Determines how the output is generated, one of
+#' @returns The result depends on the `format` argument.
+#' \describe{
+#'   \item{class}{A list with 4 vectors: `Critical`, `Success`, `Fail`, `Botch`.}
+#'   \item{df}{A data frame with the columns:
+#'   Outcome (each sum of dice), `p` (probability for this outcome),
+#'   `Remainder` (remaining skill points), `QL` (the quality level)}
+#'   \item{ql}{List with all quality levels (`QL1`-`QL6`)
+#'   and a list element for failures (`FAIL`).}
+#' }
 #' Each vector lists the probabilities for the given `x`.
+#' @export
 dSkill <- function(x, eav, skill, format = c("class", "df", "ql")) {
   stopifnot(length(eav) == 3L)
   stopifnot(all(eav > 0L))
