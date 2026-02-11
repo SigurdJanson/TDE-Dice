@@ -127,13 +127,17 @@ d3D20 <- function(x) {
 #' The likelihood for success or failure when rolling a skill check.
 #' @param x A vector of dice sums.
 #' @param skills A vector with 3 places, each being an effective
+#' @param eav A vector with 3 places, each being an effective
 #' attribute value.
 #' @returns Returns a list with 4 vectors:
 #' `Critical`, `Success`, `Fail`, `Botch`.
+#' @param skill The skill value
+#' @param format Determines how the output is generated, one of
 #' Each vector lists the probabilities for the given `x`.
-dSkill <- function(x, eav, skill) {
+dSkill <- function(x, eav, skill, format = c("class", "df", "ql")) {
   stopifnot(length(eav) == 3L)
   stopifnot(all(eav > 0L))
+  format <- match.arg(format)
 
   # "constants"
   maxd20 <- 20L
@@ -153,18 +157,39 @@ dSkill <- function(x, eav, skill) {
     crit3d20(eav) / 8000 -
     botch3d20(eav) / 8000
 
-  ###maxQL <- findInterval(skill, vec = c(4, 7, 10, 13, 16)) + 1L
-  threshold <- min(sum(eav) + skill, max3d20) # separates success from failures
-  return(
-    list(
-      Critical = (3*19 + 1) / totalEvents,
-      Success = sum(distr[1:threshold]),
-      Fail = if (threshold < max3d20)
-        sum(distr[(threshold+1L):max3d20])
-      else
-        0.0,
-      Botch = (3*19 + 1) / totalEvents
-    )
+  # EXTRACT RESULTS
+  remainingSkillPoints <- if (skill > 0) (skill-1):0 else integer()
+  remainingSkillPoints <- c(rep(skill, sum(eav)), remainingSkillPoints)[1:max3d20]
+  if (length(remainingSkillPoints) < max3d20)
+    remainingSkillPoints <- c(remainingSkillPoints, rep(0L, max3d20-length(remainingSkillPoints)))
+
+  data <- data.frame(
+    p = distr,
+    Outcome = 1L:max3d20,
+    Remainder = factor(remainingSkillPoints),
+    QL = factor(qualityLevel(remainingSkillPoints),
+                levels = c(1:qualityLevel(skill), "0"),
+                labels = c(paste0("QL", 1:qualityLevel(skill)), "Failed"))
   )
+
+  # FORMAT OUTPUT
+  if (format == "class") {
+    threshold <- min(sum(eav) + skill, max3d20) # separates success from failures
+    return(
+      list(
+        Critical = (3*19 + 1) / totalEvents,
+        Success = sum(distr[1:threshold]),
+        Fail = if (threshold < max3d20)
+          sum(distr[(threshold+1L):max3d20])
+        else
+          0.0,
+        Botch = (3*19 + 1) / totalEvents
+      )
+    )
+  } else if (format == "df") {
+    return(data)
+  } else if (format == "ql") {
+    stop("not implemented")
+  }
 }
 
