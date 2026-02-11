@@ -9,11 +9,14 @@ Authors@R: c(
       role = c("aut", "cre")
     )
   )
-Description: More about what it does (maybe more than one line).
-    Continuation lines should be indented.
-License: MIT Licence
+Description: Provides functions for the statistics of the role-playing game 'The Dark Eye'.
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+Imports:
+    ggplot2, stats
+Depends: R (>= 4.2.0)
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+RoxygenNote: 7.3.3
