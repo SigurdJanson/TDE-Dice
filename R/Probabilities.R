@@ -104,7 +104,7 @@ pAttr <- function(eav) {
 
 #' The density function for rolling a sum of 3d20.
 #' @param x A vector of dice sums.
-#' @value The vector of length 60 starts with indices 1 and 2,
+#' @returns The vector of length 60 starts with indices 1 and 2,
 #' both of which are zero because 3d20 has a sum of at least 3.
 d3D20 <- function(x) {
   freq <- c(0, 0, 1, 3, 6, 10, 15, 21, 28,
@@ -128,7 +128,7 @@ d3D20 <- function(x) {
 #' @param x A vector of dice sums.
 #' @param skills A vector with 3 places, each being an effective
 #' attribute value.
-#' @value returns a list with 4 vectors:
+#' @returns Returns a list with 4 vectors:
 #' `Critical`, `Success`, `Fail`, `Botch`.
 #' Each vector lists the probabilities for the given `x`.
 dSkill <- function(x, eav, skill) {
