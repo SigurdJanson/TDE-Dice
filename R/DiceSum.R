@@ -55,7 +55,7 @@ dSumKdN <- function(k = 2L, n = 6L) {
 #' @details For two fair n-sided dice (faces 1..n),
 #' the sum distribution is triangular.
 #' @describeIn sumKdN `sum2dN` is used for 2 dice because this
-#' method is a low more efficient. In fact
+#' method is a low more efficient.
 dSum2dN <- function(n = 6L) {
   stopifnot(n %% 1 == 0)
   stopifnot(n > 1)
