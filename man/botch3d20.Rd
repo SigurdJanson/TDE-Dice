@@ -7,6 +7,9 @@ of a 1 in that roll.}
 \usage{
 botch3d20(eav)
 }
+\arguments{
+\item{eav}{effective attribute value}
+}
 \description{
 in a 3d20 which are defined by at least two instances
 of a 1 in that roll.

@@ -29,6 +29,7 @@ d3D20 <- function(x) {
 # @describeIn d3D20 Distribution of critical successes
 #' in a 3d20 which are defined by at least two instances
 #' of a 1 in that roll.
+#' @param eav effective attribute value
 crit3d20 <- function(eav) {
   e1 <- c(rep(0, sum(eav)-1L), eav[1], rep(1, 20-eav[1]), rep(0, 40))
   e1 <- e1[1:60]
@@ -43,6 +44,7 @@ crit3d20 <- function(eav) {
 # @describeIn d3D20 Distribution of botches
 #' in a 3d20 which are defined by at least two instances
 #' of a 1 in that roll.
+#' @param eav effective attribute value
 botch3d20 <- function(eav) {
   e1 <- c(rep(0, 39+eav[1]), eav[1], rep(1, 20-eav[1]))
   e1 <- e1[1:60]
