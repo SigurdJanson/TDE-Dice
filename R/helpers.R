@@ -3,6 +3,7 @@
 qualityLevelBreakPoints <- c(4L, 7L, 10L, 13L, 16L)
 
 
+
 #' Determine the quality level based on available skill points.
 #' @param sp Skill points (integer)
 #' @details This function does not validate its arguments.
@@ -50,19 +51,19 @@ binSkillPoints <- function(sp) {
 # CONVOLUTION ##################
 #
 
+#' convolveDice
+#'
 #' Convolves two distributions of [n]d[M].
+#'
 #' @param x,y The two vectors to convolve.
+#'
 #' @returns Vector of length `length(x) + length(y)`.
 convolveDice <- function(x, y) {
   result <- integer(length(x) + length(y))
   for (a in 1:length(x)) {
-    for (b in 1:length(y))
-    {
-      sum <- a + b
-      prob = x[a] * y[b];
-      result[sum] = result[sum] + prob;
-    }
+    sum <- a + 1:length(y)
+    prob <- x[a] * y
+    result[sum] <- result[sum] + prob
   }
   return(result)
 }
-

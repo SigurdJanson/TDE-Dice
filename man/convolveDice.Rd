@@ -2,7 +2,7 @@
 % Please edit documentation in R/helpers.R
 \name{convolveDice}
 \alias{convolveDice}
-\title{Convolves two distributions of [n]d[M].}
+\title{convolveDice}
 \usage{
 convolveDice(x, y)
 }
