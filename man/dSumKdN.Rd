@@ -2,22 +2,20 @@
 % Please edit documentation in R/DiceSum.R
 \name{dSumKdN}
 \alias{dSumKdN}
-\title{dSumKdN
-Calculate the probability of rolling n dice with k faces.}
+\title{dSumKdN}
 \usage{
 dSumKdN(k = 2L, n = 6L)
 }
 \arguments{
-\item{k}{The number of dice (integer, `k > 1`)}
+\item{k}{number of dice (integer, `k > 1`)}
 
-\item{n}{The number of faces of the dice (integer, `n > 1`)}
+\item{n}{number of faces of the dice (integer, `n > 1`)}
 }
 \value{
 A named vector with the probabilities for each sum
 of dice.
 }
 \description{
-dSumKdN
 Calculate the probability of rolling n dice with k faces.
 }
 \details{
@@ -30,3 +28,6 @@ dSumKdN() # 2d6
 dSumKdN(4, 6) # 4d6
 dSumKdN(3, 20) # 3d20
 }
+\concept{Discrete}
+\concept{Univariate}
+\keyword{distribution}
