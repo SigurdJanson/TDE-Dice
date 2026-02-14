@@ -25,13 +25,13 @@ test_that("`is.Roll()` confirms that newRoll returns Roll object", {
 # PRINT
 #
 test_that("`print a Roll object", {
-  expect_output(print(newRoll(2, 6)), "2d6")
+  expect_output(print(newRoll(2, 6)), "2d6", fixed = TRUE)
 })
 test_that("`print a Roll object", {
-  expect_output(print(newRoll(2, 6, 1)), "2d6+1")
+  expect_output(print(newRoll(2, 6, 1)), "2d6+1", fixed = TRUE)
 })
 test_that("`print a Roll object", {
-  expect_output(print(newRoll(2, 6, -1)), "2d6-1")
+  expect_output(print(newRoll(2, 6, -1)), "2d6-1", fixed = TRUE)
 })
 
 #
