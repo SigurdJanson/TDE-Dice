@@ -4,6 +4,12 @@ test_that("eav = 1 returns values increasing by 1/20", {
     setNames(seq(1/20, 1, 1/20), 1:20)
   )
 })
+test_that("eav = 11 returns correct result", {
+  expect_equal(
+    pRect1d20(1:20, 11L),
+    setNames(c(rep(0, 10), 11/20, seq(12/20, 1, 1/20)), 1:20)
+  )
+})
 test_that("eav = 1 returns values increasing by 1/20", {
   select <- c(3, 7, 10, 14)
   expect_equal(
@@ -12,6 +18,10 @@ test_that("eav = 1 returns values increasing by 1/20", {
   )
 })
 
+
+#
+# ARGUMENT lower.trail
+#
 test_that("eav = 1 and lower.tail=F returns correct result", {
   expect_equal(
     pRect1d20(1:20, 1L, lower.tail=FALSE),
