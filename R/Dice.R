@@ -24,6 +24,7 @@ newRoll <- function(c, f, m = 0) {
 }
 
 #' @describeIn newRoll S3 method for class 'Roll'
+#' @param x a `Roll` object
 #' @export
 is.Roll <- function(x)
   is.atomic(x) &&
@@ -33,14 +34,15 @@ is.Roll <- function(x)
 
 
 #' @describeIn newRoll S3 method for class 'Roll'
+#' @param ... further arguments to be passed from or to other methods.
 #' @export
-print.Roll <- function(x) {
+print.Roll <- function(x, ...) {
   if (x[3] > 0L)
     s <- "+"
   else
     s <- "-"
   sprintf("%dd%d%s%d", x[1], x[2], s, abs(x[3])) |>
-    cat()
+    cat(...)
   invisible(x)
 }
 
@@ -50,7 +52,6 @@ print.Roll <- function(x) {
 #' combination of dice with count and faces.
 #' @param c The dice count (integer > 0)
 #' @param f The faces/sides of the dice (integer > 1)
-#' @param m an additive modifier (integer)
 #'
 #' @returns a `Roll` object is a named vector with
 #' count and faces.
@@ -68,7 +69,7 @@ newDice <- function(c, f) {
 }
 
 #' @describeIn newDice S3 method for class 'Dice'
-#' @param x a Dice object
+#' @param x a `Dice` object
 #' @export
 is.Dice <- function(x)
   is.atomic(x) &&
@@ -81,7 +82,7 @@ is.Dice <- function(x)
 #' @export
 print.Dice <- function(x, ...) {
   sprintf("%dd%d", x[1], x[2]) |>
-    cat()
+    cat(...)
   invisible(x)
 }
 

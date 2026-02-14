@@ -18,11 +18,9 @@ is.Dice(x)
 
 \item{f}{The faces/sides of the dice (integer > 1)}
 
-\item{x}{object to print}
+\item{x}{a `Dice` object}
 
 \item{...}{further arguments to be passed from or to other methods.}
-
-\item{m}{an additive modifier (integer)}
 }
 \value{
 a `Roll` object is a named vector with

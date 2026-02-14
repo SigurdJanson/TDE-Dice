@@ -11,7 +11,7 @@ newRoll(c, f, m = 0)
 
 is.Roll(x)
 
-\method{print}{Roll}(x)
+\method{print}{Roll}(x, ...)
 }
 \arguments{
 \item{c}{The dice count (integer > 0)}
@@ -19,6 +19,10 @@ is.Roll(x)
 \item{f}{The faces/sides of the dice (integer > 1)}
 
 \item{m}{an additive modifier (integer)}
+
+\item{x}{a `Roll` object}
+
+\item{...}{further arguments to be passed from or to other methods.}
 }
 \value{
 a `Roll` object is a named vector with
