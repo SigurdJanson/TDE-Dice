@@ -93,28 +93,64 @@ print.Dice <- function(x, ...) {
 
 #dice_strings <- c("2d6", "3d20", "10d8", "1d100", "roll 4d12 now")
 
+#' d
+#'
+#' Coerces an object into a `Dice` object.
+#'
+#' @param x either a string in the format '\d*d\d+' or a vector
+#' with 2 values.
+#'
+#' @details  If the vector is unnamed, the first value is
+#' interpreted as number of dice and the second is the number
+#' of sides. If there only one number it assumes `Count = 1`.
+#' If the vector has names partial matching is used for
+#' `c("Count", "Faces")`. Please note that partial matching
+#' is case-sensitive.
+#'
+#' Do not add white space in strings.
+#'
+#' Decimal places are ignored when passing decimal numbers.
+#'
 #' @returns Either a single vector with length 2
 #' and the names "count" and "face" or a list of those.
 #' It depends on the input and if there is more than 1 die
 #' found.
+#'
 d <- function(x) {
   if (is.character(x)) {
-    pattern <- "(\\d+)d(\\d+)" #"([1-9]\\d*)?d([1-9]\\d*)([/x][1-9]\\d*)?([+-]\\d+)?"
-    matches <- regmatches(dice_strings, regexec(pattern, dice_strings))
+    stopifnot(`'d' converts one die at a time` = length(x) == 1L)
 
-    dice <- do.call(rbind, lapply(matches, function(m) {
-      if (length(m) == 3) {
-        data.frame(
-          num_dice = as.integer(m[2]),
-          num_sides = as.integer(m[3])
-        )
-      } else {
-        stop("String cannot be interpreted as dice")
-      }
-    }))
+    pattern <- "(\\d*)d(\\d+)" #"([1-9]\\d*)?d([1-9]\\d*)([/x][1-9]\\d*)?([+-]\\d+)?"
+    matches <- regmatches(x, regexec(pattern, x)) |>
+      unlist()
+    if (length(matches) == 3L) {
+      if (nchar(matches[2]) == 0L)
+        return(newDice(1L, as.integer(matches[3L])))
+      else
+        return(newDice(as.integer(matches[2L]), as.integer(matches[3L])))
+    } else {
+      stop("Dice format not recognized")
+    }
     return (dice)
   }
-  if (is.numeric(x)) {
 
+  if (is.numeric(x)) {
+    lenx <- length(x)
+    if (length(names(x)) == 0) {
+      stopifnot(`At least 1 value is required. Not more than 3.` =
+                  lenx > 0 && lenx < 3)
+      if (lenx == 1L)
+        return(newDice(1L, as.integer(x[1L])))
+      else
+        return(newDice(as.integer(x[1L]), as.integer(x[2L])))
+    } #unnamed
+    # Named vector
+    names(x) <- match.arg(names(x), c("Count", "Faces"), several.ok = TRUE)
+    if (lenx == 1L)
+      return(newDice(1L, as.integer(x["Faces"])))
+    else
+      return(newDice(as.integer(x["Count"]), as.integer(x["Faces"])))
   }
+
+  stop("Dice format not recognized")
 }
