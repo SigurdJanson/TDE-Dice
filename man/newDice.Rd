@@ -14,13 +14,13 @@ is.Dice(x)
 \method{print}{Dice}(x, ...)
 }
 \arguments{
+\item{n}{The dice count (integer > 0)}
+
 \item{f}{The faces/sides of the dice (integer > 1)}
 
 \item{x}{a `Dice` object}
 
 \item{...}{further arguments to be passed from or to other methods.}
-
-\item{c}{The dice count (integer > 0)}
 }
 \value{
 a `Roll` object is a named vector with
