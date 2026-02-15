@@ -97,6 +97,18 @@ test_that("x = numeric(0) returns numeric(0)", {
   )
 })
 
+test_that("eav > 20 returns ", {
+  skill <- 21
+
+  expect_no_error(
+    result <- dhitpoints(1:6, skill, c(Count=1, Dice=6, Mod=1))
+  )
+  expect_equal(
+    result,
+    dhitpoints(1:6, 20L, c(Count=1, Dice=6, Mod=1))
+  )
+})
+
 
 #
 # EXCEPTIONS

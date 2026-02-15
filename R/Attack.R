@@ -1,5 +1,8 @@
 # TODO : implement botch level
 
+#' Helpers to determine the lowest and the highest possible
+#' hit points.
+.minHP <- function(Count, Mod) Count + Mod
 .maxHP <- function(Count, Dice, Mod) ((Count * Dice) + Mod) * 2L
 
 
@@ -35,7 +38,7 @@ dhitpoints <- function(x, eav, w, bl = 20L) {
   if(length(x) == 0) return(numeric())
   stopifnot(`Only a single attack value is supported` = length(eav) == 1)
 
-  minHP <- w["Count"] + w["Mod"]
+  minHP <- .minHP(w["Count"], w["Mod"])
   maxHP <- .maxHP(w["Count"], w["Dice"], w["Mod"])
   stopifnot(`Requested quantiles outside range of distribution` =
               all(1 <= x) && all(x <= maxHP))
@@ -47,10 +50,11 @@ dhitpoints <- function(x, eav, w, bl = 20L) {
   else
     dhp <- dSumKdN(w["Count"], w["Dice"])
 
+  eav <- min(eav, 20L)
   Critical = eav / 400.0 # probability of a critical success
   Success = eav / 20 - Critical # probability of a regular success
 
-  indices <- 1:length(dhp)+minHP-1
+  indices <- 1L:length(dhp)+minHP-1L
   result <- numeric(maxHP)
   result[indices] <- Success * dhp
   result[indices * 2] <- result[indices * 2] + Critical * dhp
