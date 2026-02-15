@@ -7,6 +7,33 @@
 
 
 
+#' cAttack
+#' The CSFB probabilities for an attack, parry, or dodge rolls.
+#' @param eav the effective attribute to roll against.
+#' @param bl The botch level, typically only a 20 is a botch, but some
+#' weapons or maneouvers change that.
+#'
+#' @returns A list with 4 vectors: `Critical`, `Success`, `Fail`, `Botch`
+#' (S3 class `CSFB`).
+#' @export
+#'
+#' @examples
+#' cCombat(12)
+cCombat <- function(eav, bl = 20L) {
+  stopifnot(`'eav' must be >= 1` = all(eav > 0))
+
+  eav <- pmin(eav, 20L)
+  result <- list(
+    Critical = eav / 400.0,
+    Success = pmin(19*eav / 400.0, (19*20-1) / 400), # pmax corrects p(EAV=20)
+    Fail = (380 - 19*eav) / 400.0,
+    Botch = pmax(20 - eav, 1) / 400.0, # pmax corrects p(EAV=20)
+    Type = "Attack"
+  )
+  class(result) <- "CSFB"
+  return(result)
+}
+
 #' Hit point distribution
 #'
 #' @param x,q vector of quantiles, the number of hit points
