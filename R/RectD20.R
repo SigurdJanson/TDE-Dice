@@ -95,7 +95,7 @@ pRect1d20 <- function(q, eav, lower.tail = TRUE) {
 qRect1d20 <- function(p, eav, lower.tail = TRUE) {
   stopifnot(`'eav' must be a scalar within 1-20` =
               length(eav) == 1L, eav >= 1 && eav <= 20)
-  stopifnot(!is.null(p))
+  stopifnot(!is.null(p) && !is.na(p))
   if (any(p < 0 | p > 1)) stop("p must be between 0 and 1")
 
   if (!lower.tail) {
