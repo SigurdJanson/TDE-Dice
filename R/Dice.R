@@ -12,13 +12,15 @@
 #'
 #' @examples
 #' newRoll(2, 6, 2)
-newRoll <- function(c, f, m = 0) {
+newRoll <- function(n, f, m = 0) {
+  if (!(is.numeric(n) && n > 0 && n %% 1 == 0))
+    stop("count must be an integer > 0")
+  if (!(is.numeric(f) && f > 1 && f %% 1 == 0))
+    stop("faces must be an integer > 1")
   stopifnot(
-    is.numeric(c), c > 0, c %% 1 == 0,
-    is.numeric(f), f > 1, f %% 1 == 0,
     is.numeric(m), m %% 1 == 0
   )
-  result <- c(Count = c, Faces = f, Mod = m)
+  result <- c(Count = n, Faces = f, Mod = m)
   class(result) <- "Roll"
   return(result)
 }
@@ -58,12 +60,13 @@ print.Roll <- function(x, ...) {
 #' @export
 #' @examples
 #' newDice(2, 20)
-newDice <- function(c, f) {
-  stopifnot(
-    is.numeric(c), c > 0, c %% 1 == 0,
-    is.numeric(f), f > 1, f %% 1 == 0
-  )
-  result <- c(Count = c, Faces = f)
+newDice <- function(n, f) {
+  if (!(is.numeric(n) && n > 0 && n %% 1 == 0))
+    stop("count must be an integer > 0")
+  if (!(is.numeric(f) && f > 1 && f %% 1 == 0))
+    stop("faces must be an integer > 1")
+
+  result <- c(Count = n, Faces = f)
   class(result) <- "Dice"
   return(result)
 }
