@@ -7,15 +7,13 @@
 \title{Creates an object to specify a die roll
 with count, faces, and modifier.}
 \usage{
-newRoll(c, f, m = 0)
+newRoll(n, f, m = 0)
 
 is.Roll(x)
 
 \method{print}{Roll}(x, ...)
 }
 \arguments{
-\item{c}{The dice count (integer > 0)}
-
 \item{f}{The faces/sides of the dice (integer > 1)}
 
 \item{m}{an additive modifier (integer)}
@@ -23,6 +21,8 @@ is.Roll(x)
 \item{x}{a `Roll` object}
 
 \item{...}{further arguments to be passed from or to other methods.}
+
+\item{c}{The dice count (integer > 0)}
 }
 \value{
 a `Roll` object is a named vector with

@@ -2,7 +2,7 @@
 
 #' Creates an object to specify a die roll
 #' with count, faces, and modifier.
-#' @param c The dice count (integer > 0)
+#' @param n The dice count (integer > 0)
 #' @param f The faces/sides of the dice (integer > 1)
 #' @param m an additive modifier (integer)
 #'
@@ -52,7 +52,7 @@ print.Roll <- function(x, ...) {
 
 #' Creates an object to specify a
 #' combination of dice with count and faces.
-#' @param c The dice count (integer > 0)
+#' @param n The dice count (integer > 0)
 #' @param f The faces/sides of the dice (integer > 1)
 #'
 #' @returns a `Roll` object is a named vector with
@@ -97,7 +97,7 @@ print.Dice <- function(x, ...) {
 #'
 #' Coerces an object into a `Dice` object.
 #'
-#' @param x either a string in the format '\d*d\d+' or a vector
+#' @param x either a string in the format '\\d*d\\d+' or a vector
 #' with 2 values.
 #'
 #' @details  If the vector is unnamed, the first value is
