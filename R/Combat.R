@@ -42,6 +42,10 @@ cCombat <- function(eav, bl = 20L) {
   return(result)
 }
 
+
+# TODO: add 0 hp to dhitpoints
+# TODO: handle weapons mod that lead to 0 hit points
+
 #' Hit point distribution
 #'
 #' @param x,q vector of quantiles, the number of hit points
@@ -56,6 +60,8 @@ cCombat <- function(eav, bl = 20L) {
 #' `dhitpoints` gives the density, `phitpoints` gives the distribution
 #' function, `qhitpoints` gives the quantile function and
 #' `rhitpoints` generates random deviates.
+#'
+#' Throws en error when x is empty or outside
 #'
 #' @name HitPointDistribution
 #' @aliases DiscreteHitPoints
@@ -99,4 +105,63 @@ dhitpoints <- function(x, eav, w, bl = 20L) {
       as.numeric() |>
       setNames(x)
   )
+}
+
+#
+#' @describeIn HitPointDistribution description
+phitpoints <- function(q, eav, w, bl = 20L, lower.tail = TRUE) {
+  maxHP <- .maxHP(w["Count"], w["Dice"], w["Mod"])
+  if (lower.tail)
+    select <- 1:max(q)
+  else
+    select <- 1:maxHP
+
+  dhp <- dhitpoints(select, eav, w, bl)
+  if (lower.tail)
+    php <- cumsum(dhp) # cumsum preserves names
+  else
+    php <- rev(cumsum(rev(dhp)))
+  return(php[q])
+}
+
+
+#' @describeIn HitPointDistribution description
+#' @param p vector of probabilities.
+qhitpoints <- function(p, eav, w, bl = 20L, lower.tail = TRUE) {
+  stopifnot(`'eav' must be a scalar within 1-20` =
+              length(eav) == 1L, eav >= 1 && eav <= 20)
+  stopifnot(!is.null(p) && !is.na(p))
+  if (any(p < 0 | p > 1)) stop("p must be between 0 and 1")
+
+  if (!lower.tail) {
+    p <- 1 - p
+  }
+
+}
+
+
+
+
+#' @describeIn HitPointDistribution description
+#' @param n number of observations. If `length(n) > 1`,
+#' the length is taken to be the number required.
+rhitpoints <- function(n, eav, w, bl = 20L) {
+  stopifnot(`'eav' must be a scalar within 1-20` =
+              length(eav) == 1L, eav >= 1 && eav <= 20)
+  if (length(n) > 1L)
+    n <- length(n)
+  else if (length(n) == 0L || n == 0L)
+    return(integer())
+  else if (n < 0)
+    stop("'n' must be greater than 0")
+
+  minHP <- .minHP(w["Count"], w["Mod"])
+  maxHP <- .maxHP(w["Count"], w["Dice"], w["Mod"])
+  HP <- minHP:maxHP
+
+  chances <- cCombat(eav, bl)
+  p <- dhitpoints(HP, eav, w, bl)
+  p <- c(chances$Fail + chances$Botch, p)
+  #DEBUG: if (length(c(0, HP)) != length(p)) stop(length(c(0, HP)), "!=", length(p))
+  sample(c(0, HP), n, replace=TRUE, prob = p)
 }
