@@ -1,8 +1,16 @@
 # TODO : implement botch level
 
+#' Hit Point Limits
+#'
 #' Helpers to determine the lowest and the highest possible
 #' hit points.
+#' @returns `.minHP` is an integer >= 0. `.maxHP` is an integer
+#' with `.maxHP > .minHP`.
+#' @noRd
+#' @name HitPointLimits
+#' @keywords internal
 .minHP <- function(Count, Mod) Count + Mod
+#' @describeIn HitPointLimits maximum hit points
 .maxHP <- function(Count, Dice, Mod) ((Count * Dice) + Mod) * 2L
 
 
