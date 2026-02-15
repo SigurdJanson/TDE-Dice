@@ -39,6 +39,10 @@ test_that("d20 has the correct weighted distribution", {
 test_that("n = 0 returns an empty set", {
   expect_equal(rRect1d20(0, 1), integer())
 })
+test_that("length(n) > 1 , then length(n) is used for n", {
+  len <- sample(1:10, 1)
+  expect_length(rRect1d20(rep(0, len), 12), len)
+})
 
 
 

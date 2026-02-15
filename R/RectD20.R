@@ -127,6 +127,6 @@ rRect1d20 <- function(n, eav) {
   else if (n < 0)
     stop("'n' must be greater than 0")
 
-  roll <- sample(1:20, size = 1)
+  roll <- sample(1:20, size = n, replace = TRUE)
   return(pmax(roll, eav))
 }
