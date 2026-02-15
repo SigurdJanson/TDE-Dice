@@ -23,11 +23,11 @@ test_that("`is.Dice()` confirms that newRoll returns a Dice object", {
 #
 # PRINT
 #
-test_that("`print a Dice object", {
+test_that("print a Dice object", {
   #print(newDice(2, 6))
   expect_output(print(newDice(2, 6)), "2d6")
 })
-test_that("`print a Dice object", {
+test_that("print a Dice object", {
   expect_output(print(newDice(3, 20)), "3d20")
 })
 
