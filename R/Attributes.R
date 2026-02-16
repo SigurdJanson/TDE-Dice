@@ -72,7 +72,7 @@ cAttr_BF <- function(eav) {
 #' @export
 #' @examples cAttr(12)
 cAttr <- function(eav) {
-  stopifnot(eav > 0)
+  stopifnot(all(eav > 0))
   eav <- pmin(eav, 19)
   return(newCSFB(
     cr = eav / 400.0,
