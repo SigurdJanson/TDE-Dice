@@ -3,19 +3,19 @@ test_that("result is correctly formatted object", {
   result <- cCombat(1:21)
   expect_s3_class(result, "CSFB")
   expect_type(result, "list")
-  expect_named(result, c("Critical", "Success", "Fail", "Botch", "Type"))
+  expect_named(result, c("Critical", "Success", "Fail", "Botch"))
 })
 
 
 test_that("result is correctly formatted object", {
   result <- cCombat(1:21)
   expect_s3_class(result, "CSFB")
+  expect_equal(attributes(result)$check, "Combat")
   expect_type(result, "list")
-  expect_named(result, c("Critical", "Success", "Fail", "Botch", "Type"))
+  expect_named(result, c("Critical", "Success", "Fail", "Botch"))
   for (element in result[1:4]) {
     expect_vector(element, numeric())
   }
-  expect_vector(result$Type, character())
 })
 
 
@@ -40,9 +40,8 @@ test_that("eav=1", {
     structure(
       list(
         Critical = 1/400, Success = 19/400,
-        Fail = 19/20-19/400, Botch = 19/400,
-        Type = "Attack"
-      ), class = "CSFB")
+        Fail = 19/20-19/400, Botch = 19/400
+      ), class = "CSFB", check = "Combat")
   )
 })
 
@@ -54,9 +53,8 @@ test_that("eav=20", {
     structure(
       list(
         Critical = 1/20, Success = 19/20-1/400,
-        Fail = 0, Botch = 1/400,
-        Type = "Attack"
-      ), class = "CSFB")
+        Fail = 0, Botch = 1/400
+      ), class = "CSFB", check = "Combat")
   )
 })
 

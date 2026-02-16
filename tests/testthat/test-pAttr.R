@@ -2,11 +2,14 @@ test_that("pAttr_BF: eav = 10", {
   eav <- 10L
   expect_equal(
     pAttr_BF(eav),
-    list(
-      Critical = 0.5 / 20,
-      Success = 9.0 / 20 + 0.5 / 20,
-      Fail = 9.0 / 20 + 0.5 / 20,
-      Botch = 0.5 / 20),
+    structure(
+      list(
+        Critical = 0.5 / 20,
+        Success = 9.0 / 20 + 0.5 / 20,
+        Fail = 9.0 / 20 + 0.5 / 20,
+        Botch = 0.5 / 20),
+      class = "CSFB", check = "Attribute"
+    ),
     info = paste("eav = ", eav)
   )
 })
@@ -15,11 +18,14 @@ test_that("pAttr: eav = 10", {
   eav <- 10L
   expect_equal(
     pAttr(eav),
-    list(
-      Critical = 0.5 / 20,
-      Success = 9.0 / 20 + 0.5 / 20,
-      Fail = 9.0 / 20 + 0.5 / 20,
-      Botch = 0.5 / 20),
+    structure(
+      list(
+        Critical = 0.5 / 20,
+        Success = 9.0 / 20 + 0.5 / 20,
+        Fail = 9.0 / 20 + 0.5 / 20,
+        Botch = 0.5 / 20),
+      class = "CSFB", check = "Attribute"
+    ),
     info = paste("eav = ", eav)
   )
 })

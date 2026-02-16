@@ -1,4 +1,4 @@
-.checkTypes <- c("Attack", "Parry", "Dodge", "Skill", "Attribute")
+.checkTypes <- c("Combat", "Attack", "Parry", "Dodge", "Skill", "Attribute")
 
 #' Creates an object to specify the CSFB outcomes of a
 #' TDE check. CSFB are the 4 values of this check
@@ -88,3 +88,7 @@ print.CSFB <- function(x, digits = NULL, quote = FALSE,
 
   invisible(x)
 }
+
+
+as.data.frame.CSFB <- function(x, ...)
+  unclass(x) |> as.data.frame()

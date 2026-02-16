@@ -31,14 +31,13 @@ cCombat <- function(eav, bl = 20L) {
   stopifnot(`'eav' must be >= 1` = all(eav > 0))
 
   eav <- pmin(eav, 20L)
-  result <- list(
-    Critical = eav / 400.0,
-    Success = pmin(19*eav / 400.0, (19*20-1) / 400), # pmax corrects p(EAV=20)
-    Fail = (380 - 19*eav) / 400.0,
-    Botch = pmax(20 - eav, 1) / 400.0, # pmax corrects p(EAV=20)
-    Type = "Attack"
+  result <- newCSFB(
+    cr = eav / 400.0,
+    su = pmin(19*eav / 400.0, (19*20-1) / 400), # pmax corrects p(EAV=20)
+    fa = (380 - 19*eav) / 400.0,
+    bo = pmax(20 - eav, 1) / 400.0, # pmax corrects p(EAV=20)
+    check = "Combat"
   )
-  class(result) <- "CSFB"
   return(result)
 }
 

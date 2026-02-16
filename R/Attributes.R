@@ -48,13 +48,12 @@ pAttr_BF <- function(eav) {
     }
   }
 
-  return(
-    list(
-      Critical = result$Critical / TotalEvents,
-      Success = result$Success / TotalEvents,
-      Fail = result$Fail / TotalEvents,
-      Botch = result$Botch / TotalEvents
-    )
+  return(newCSFB(
+      cr = result$Critical / TotalEvents,
+      su = result$Success / TotalEvents,
+      fa = result$Fail / TotalEvents,
+      bo = result$Botch / TotalEvents,
+      check = "Attribute")
   )
 }
 
@@ -66,13 +65,12 @@ pAttr_BF <- function(eav) {
 pAttr <- function(eav) {
   stopifnot(eav > 0)
   eav <- pmin(eav, 19)
-  return(
-    list(
-      Critical = eav / 400.0,
-      Success = 19*eav / 400.0,
-      Fail = (380 - 19*eav) / 400.0,
-      Botch = (20 - eav) / 400.0
-    )
+  return(newCSFB(
+    cr = eav / 400.0,
+    su = 19*eav / 400.0,
+    fa = (380 - 19*eav) / 400.0,
+    bo = (20 - eav) / 400.0,
+    check = "Attribute")
   )
 }
 
