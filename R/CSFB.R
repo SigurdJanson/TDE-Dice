@@ -66,7 +66,7 @@ is.CSFB <- function(x)
 #' to be printed. By default, when NULL, getOption("max.print") used.
 #' @param ... further arguments to be passed from or to other methods.
 #'
-#' @returns
+#' @returns `print.CSFB` returns `x` invisibly.
 #' @export
 #'
 #' @examples
