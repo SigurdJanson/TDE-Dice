@@ -7,10 +7,15 @@
 #' It is only defined for `1 <= eav <= 20`.
 rect1d20 <- function(eav) c(rep(0L, eav-1L), eav, rep(1L, 20L - eav))
 
+#' d3D20
+#'
 #' The density function for rolling a sum of 3d20.
+#'
 #' @param x A vector of dice sums.
-#' @returns The vector of length 60 starts with indices 1 and 2,
-#' both of which are zero because 3d20 has a sum of at least 3.
+#'
+#' @returns The vector of length 60 starts with index 1,
+#' Index 1 and 2 are both zero because 3d20 have a sum of
+#' at least 3.
 #' @export
 d3D20 <- function(x) {
   freq <- c(0, 0, 1, 3, 6, 10, 15, 21, 28,
@@ -31,14 +36,18 @@ d3D20 <- function(x) {
 #' of a 1 in that roll.
 #' @param eav effective attribute value
 crit3d20 <- function(eav) {
-  e1 <- c(rep(0, sum(eav)-1L), eav[1], rep(1, 20-eav[1]), rep(0, 40))
-  e1 <- e1[1:60]
-  e2 <- c(rep(0, sum(eav)-1L), eav[2], rep(1, 20-eav[2]), rep(0, 40))
-  e2 <- e2[1:60]
-  e3 <- c(rep(0, sum(eav)-1L), eav[3], rep(1, 20-eav[3]), rep(0, 40))
-  e3 <- e3[1:60]
-  e1[sum(eav)] <- e1[sum(eav)] -2L
-  return(e1+e2+e3)
+  partial <- function(aoi, alla) { # attribute of interest vs. all
+    r <- c(rep(0, sum(alla)-1L), aoi, rep(1, 20-aoi), rep(0, 40))
+    return(r[1:60])
+  }
+
+  result <- numeric(60L)
+  for (a in eav) {
+    result = result + partial(a, eav)
+  }
+  result[sum(eav)] <- result[sum(eav)] -2L
+
+  return(result)
 }
 
 # @describeIn d3D20 Distribution of botches
@@ -46,14 +55,18 @@ crit3d20 <- function(eav) {
 #' of a 1 in that roll.
 #' @param eav effective attribute value
 botch3d20 <- function(eav) {
-  e1 <- c(rep(0, 39+eav[1]), eav[1], rep(1, 20-eav[1]))
-  e1 <- e1[1:60]
-  e2 <- c(rep(0, 39+eav[2]), eav[2], rep(1, 20-eav[2]))
-  e2 <- e2[1:60]
-  e3 <- c(rep(0, 39+eav[3]), eav[3], rep(1, 20-eav[3]))
-  e3 <- e3[1:60]
-  e1[60L] <- e1[60L] -2L
-  return(e1+e2+e3)
+  partial <- function(aoi) { # attribute of interest vs. all
+    r <- c(rep(0, 39+aoi), aoi, rep(1, 20-aoi))
+    return(r[1:60])
+  }
+
+  result <- numeric(60L)
+  for (a in eav) {
+    result = result + partial(a)
+  }
+  result[60L] <- result[60L] -2L
+
+  return(result)
 }
 
 
