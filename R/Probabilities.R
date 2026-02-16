@@ -1,11 +1,9 @@
-#' Create a probability distribution for a d20 truncated at and
-#' rectified to `eav`.
-#' @param eav The effective attribute value of the check
-#' @returns An integer vector representing the number of events
-#' for each face from 1 to 20.
-#' @details This function does not validate it's arguments.
-#' It is only defined for `1 <= eav <= 20`.
-rect1d20 <- function(eav) c(rep(0L, eav-1L), eav, rep(1L, 20L - eav))
+
+# Skill related "constants"
+maxd20 <- 20L # max faces of a d20
+max3d20 <- 60L # the maximum sum of 3d20
+totalEvents <- 8000L # total number of events with 3d20
+
 
 #' d3D20
 #'
@@ -71,16 +69,6 @@ botch3d20 <- function(eav) {
 
 
 
-#
-# SKILLS ###################
-#
-
-# "constants"
-maxd20 <- 20L
-max3d20 <- 60L # "constant': the max sum of 3d20
-totalEvents <- 8000L # "constant': number of events with 3d20
-
-
 
 #' cSkill
 #'
@@ -118,6 +106,11 @@ cSkill <- function(eav, skill) {
     bo = (3*19 + 1) / totalEvents,
     check = "Skill")
   )
+}
+
+
+
+
 
 #' The likelihood for the outcomes of a skill check.
 #' @param x A vector of dice sums.
@@ -125,14 +118,14 @@ cSkill <- function(eav, skill) {
 #' attribute value.
 #' @param skill The skill value
 #' @param format Determines how the output is generated, one of
+#'
+#'
 #' @returns The result depends on the `format` argument.
 #' \describe{
 #'   \item{vector}{}
 #'   \item{df}{A data frame with the columns:
 #'   Outcome (each sum of dice), `p` (probability for this outcome),
 #'   `Remainder` (remaining skill points), `QL` (the quality level)}
-#'   \item{ql}{List with all quality levels (`QL1`-`QL6`)
-#'   and a list element for failures (`FAIL`).}
 #' }
 #' Each vector lists the probabilities for the given `x`.
 #' @export
@@ -140,10 +133,6 @@ dSkill <- function(x, eav, skill, format = c("vector", "df")) {
   stopifnot(length(eav) == 3L)
   stopifnot(all(eav > 0L))
   format <- match.arg(format)
-
-  maxd20 <- 20L
-  max3d20 <- 60L # "constant': the max sum of 3d20
-  totalEvents <- 8000L # "constant': number of events with 3d20
 
   #
   eav <- pmin(eav, maxd20)
@@ -153,33 +142,31 @@ dSkill <- function(x, eav, skill, format = c("vector", "df")) {
   distr <- convolveDice(rect1d20(eav[1]), rect1d20(eav[2]))
   distr <- convolveDice(distr, rect1d20(eav[3]))
   distr <- distr / totalEvents
-
-  distr <- distr -
-    crit3d20(eav) / 8000 -
-    botch3d20(eav) / 8000
-
-  # EXTRACT RESULTS
-  remainingSkillPoints <- if (skill > 0) (skill-1):0 else integer()
-  remainingSkillPoints <- c(rep(skill, sum(eav)), remainingSkillPoints)[1:max3d20]
-  if (length(remainingSkillPoints) < max3d20)
-    remainingSkillPoints <- c(remainingSkillPoints, rep(0L, max3d20-length(remainingSkillPoints)))
-
-  data <- data.frame(
-    p = distr,
-    Outcome = 1L:max3d20,
-    Remainder = factor(remainingSkillPoints),
-    QL = factor(qualityLevel(remainingSkillPoints),
-                levels = c(1:qualityLevel(skill), "0"),
-                labels = c(paste0("QL", 1:qualityLevel(skill)), "Failed"))
-  )
+  # Remove criticals and botches from the distr.
+  distr <- distr - (crit3d20(eav) - botch3d20(eav)) / totalEvents
 
   # FORMAT OUTPUT
-      )
-  } else if (format == "df") {
   if (format == "df") {
+    if (skill > 0)
+      skillRemainder <- (skill-1):0
+    else
+      skillRemainder <- integer()
+    skillRemainder <- c(rep(skill, sum(eav)), skillRemainder)[1:max3d20]
+    if (length(skillRemainder) < max3d20)
+      skillRemainder <- c(skillRemainder, rep(0L, max3d20-length(skillRemainder)))
+
+    data <- data.frame(
+      p = distr,
+      Outcome = 1L:max3d20,
+      Remainder = factor(skillRemainder),
+      QL = factor(qualityLevel(skillRemainder),
+                  levels = c(1:qualityLevel(skill), "0"),
+                  labels = c(paste0("QL", 1:qualityLevel(skill)), "Failed"))
+    )
+
     return(data)
   } else {
-    return(distr)
+    return(setNames(distr, 1L:max3d20))
   }
 }
 
