@@ -75,6 +75,49 @@ botch3d20 <- function(eav) {
 # SKILLS ###################
 #
 
+# "constants"
+maxd20 <- 20L
+max3d20 <- 60L # "constant': the max sum of 3d20
+totalEvents <- 8000L # "constant': number of events with 3d20
+
+
+
+#' cSkill
+#'
+#'
+#'
+#' @param eav A vector with 3 places, each being an effective
+#' attribute value.
+#' @param skill The skill value
+#'
+#' @returns A CSFB object with 4 vectors:
+#' `Critical`, `Success`, `Fail`, `Botch`.
+#'
+#' @seealso \link{cAttr}, \link{cCombat}, \link{CSFB}
+#'
+#' @export
+#'
+#' @examples
+#' cSkill(c(11, 12, 14), 7)
+cSkill <- function(eav, skill) {
+  stopifnot(`'eav' must be greater than 0 to use a skill` =
+              all(eav > 0))
+
+  eav <- pmin(eav, maxd20)
+
+  threshold <- min(sum(eav) + skill, max3d20) # separates successes from fails
+  distr <- dSkill(1:60, eav, skill)
+
+  return(newCSFB(
+    cr = (3*19 + 1) / totalEvents,
+    su = sum(distr[1:threshold]),
+    fa = if (threshold < max3d20)
+      sum(distr[(threshold+1L):max3d20])
+    else
+      0.0,
+    bo = (3*19 + 1) / totalEvents,
+    check = "Skill")
+  )
 
 #' The likelihood for the outcomes of a skill check.
 #' @param x A vector of dice sums.
@@ -84,7 +127,7 @@ botch3d20 <- function(eav) {
 #' @param format Determines how the output is generated, one of
 #' @returns The result depends on the `format` argument.
 #' \describe{
-#'   \item{class}{A list with 4 vectors: `Critical`, `Success`, `Fail`, `Botch`.}
+#'   \item{vector}{}
 #'   \item{df}{A data frame with the columns:
 #'   Outcome (each sum of dice), `p` (probability for this outcome),
 #'   `Remainder` (remaining skill points), `QL` (the quality level)}
@@ -93,12 +136,11 @@ botch3d20 <- function(eav) {
 #' }
 #' Each vector lists the probabilities for the given `x`.
 #' @export
-dSkill <- function(x, eav, skill, format = c("class", "df", "ql")) {
+dSkill <- function(x, eav, skill, format = c("vector", "df")) {
   stopifnot(length(eav) == 3L)
   stopifnot(all(eav > 0L))
   format <- match.arg(format)
 
-  # "constants"
   maxd20 <- 20L
   max3d20 <- 60L # "constant': the max sum of 3d20
   totalEvents <- 8000L # "constant': number of events with 3d20
@@ -132,23 +174,12 @@ dSkill <- function(x, eav, skill, format = c("class", "df", "ql")) {
   )
 
   # FORMAT OUTPUT
-  if (format == "class") {
-    threshold <- min(sum(eav) + skill, max3d20) # separates success from failures
-    return(
-      list(
-        Critical = (3*19 + 1) / totalEvents,
-        Success = sum(distr[1:threshold]),
-        Fail = if (threshold < max3d20)
-          sum(distr[(threshold+1L):max3d20])
-        else
-          0.0,
-        Botch = (3*19 + 1) / totalEvents
       )
-    )
   } else if (format == "df") {
+  if (format == "df") {
     return(data)
-  } else if (format == "ql") {
-    stop("not implemented")
+  } else {
+    return(distr)
   }
 }
 
