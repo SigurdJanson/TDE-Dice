@@ -1,13 +1,9 @@
-#
-# ATTRIBUTES ###################
-#
-
 
 #' Determine the probability of an attribute check
-#' @describeIn pAttr Uses a brute force algorithm. It is
+#' @describeIn cAttr Uses a brute force algorithm. It is
 #' intended for analysis purposes rather than practical use.
 #' @param eav effective attribute value
-pAttr_BF <- function(eav) {
+cAttr_BF <- function(eav) {
   stopifnot(eav > 0)
 
   result <- list(
@@ -61,8 +57,8 @@ pAttr_BF <- function(eav) {
 #' @param eav effective attribute value
 #' @returns A list with 4 vectors: `Critical`, `Success`, `Fail`, `Botch`.
 #' @export
-#' @examples pAttr(12)
-pAttr <- function(eav) {
+#' @examples cAttr(12)
+cAttr <- function(eav) {
   stopifnot(eav > 0)
   eav <- pmin(eav, 19)
   return(newCSFB(

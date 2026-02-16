@@ -1,7 +1,7 @@
-test_that("pAttr_BF: eav = 10", {
+test_that("cAttr_BF: eav = 10", {
   eav <- 10L
   expect_equal(
-    pAttr_BF(eav),
+    cAttr_BF(eav),
     structure(
       list(
         Critical = 0.5 / 20,
@@ -14,10 +14,10 @@ test_that("pAttr_BF: eav = 10", {
   )
 })
 
-test_that("pAttr: eav = 10", {
+test_that("cAttr: eav = 10", {
   eav <- 10L
   expect_equal(
-    pAttr(eav),
+    cAttr(eav),
     structure(
       list(
         Critical = 0.5 / 20,
@@ -31,19 +31,19 @@ test_that("pAttr: eav = 10", {
 })
 
 
-test_that("pAttr: Brute force gives same result as efficient algorithm", {
+test_that("cAttr: Brute force gives same result as efficient algorithm", {
   eav <- sample(1L:20, 1L)
   expect_equal(
-    pAttr(eav),
-    pAttr_BF(eav),
+    cAttr(eav),
+    cAttr_BF(eav),
     info = paste("eav = ", eav)
   )
 })
 
 
-test_that("pAttr: sum is always 1", {
+test_that("cAttr: sum is always 1", {
   eav <- 1:20
-  result <- pAttr(eav)
+  result <- cAttr(eav)
 
   # sum up all results
   sums <- result |> as.data.frame() |> rowSums()
