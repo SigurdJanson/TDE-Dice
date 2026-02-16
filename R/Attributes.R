@@ -1,8 +1,6 @@
 
-#' Determine the probability of an attribute check
 #' @describeIn cAttr Uses a brute force algorithm. It is
 #' intended for analysis purposes rather than practical use.
-#' @param eav effective attribute value
 cAttr_BF <- function(eav) {
   stopifnot(eav > 0)
 
@@ -53,9 +51,6 @@ cAttr_BF <- function(eav) {
   )
 }
 
-#' Determine the probabilities for the outcomes of an attribute check
-#' @param eav effective attribute value
-#' @returns A list with 4 vectors: `Critical`, `Success`, `Fail`, `Botch`.
 
 
 #' cAttr
@@ -68,6 +63,10 @@ cAttr_BF <- function(eav) {
 #' `Critical`, `Success`, `Fail`, `Botch`.
 #'
 #' @seealso \link{cCombat}, \link{cSkill}, \link{CSFB}
+#'
+#' @keywords distribution
+#' @concept Univariate
+#' @concept Discrete
 #'
 #' @export
 #' @examples cAttr(12)

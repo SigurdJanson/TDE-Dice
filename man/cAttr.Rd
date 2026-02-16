@@ -3,22 +3,22 @@
 \name{cAttr_BF}
 \alias{cAttr_BF}
 \alias{cAttr}
-\title{Determine the probability of an attribute check}
+\title{cAttr}
 \usage{
 cAttr_BF(eav)
 
 cAttr(eav)
 }
 \arguments{
-\item{eav}{effective attribute value}
+\item{eav}{effective attribute value (integer, vector)}
 }
 \value{
-A list with 4 vectors: `Critical`, `Success`, `Fail`, `Botch`.
+A CSFB object with 4 vectors:
+`Critical`, `Success`, `Fail`, `Botch`.
 }
 \description{
-Determine the probability of an attribute check
-
-Determine the probabilities for the outcomes of an attribute check
+Determine the probabilities for the outcomes of an
+attribute check.
 }
 \section{Functions}{
 \itemize{
@@ -29,3 +29,9 @@ intended for analysis purposes rather than practical use.
 \examples{
 cAttr(12)
 }
+\seealso{
+\link{cCombat}, \link{cSkill}, \link{CSFB}
+}
+\concept{Discrete}
+\concept{Univariate}
+\keyword{distribution}
