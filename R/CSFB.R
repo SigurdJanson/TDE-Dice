@@ -40,6 +40,7 @@ newCSFB <- function(cr, su, fa, bo, check = .checkTypes) {
   return(result)
 }
 
+
 #' @describeIn newCSFB S3 method for class 'CSFB'
 #' @param x object of class `CSFB`.
 #' @export
@@ -78,7 +79,7 @@ print.CSFB <- function(x, digits = NULL, quote = FALSE,
   paste(length(x[[1]]), attr(x, "check"), cstr, "\n") |>
     cat()
 
-  unclass(x) |> data.frame() |>
+  as.data.frame(x) |>
     print(digits=digits, quote=quote, right=right,
           row.names=row.names, max=max, zero.print = ".", ...)
 
@@ -90,5 +91,8 @@ print.CSFB <- function(x, digits = NULL, quote = FALSE,
 }
 
 
+#' @describeIn newCSFB S3 method to coerce object to data frame
+#' @param x object to be coerced to `CSFB`
+#' @returns `as.data.frame.CSFB` returns a data frame
 as.data.frame.CSFB <- function(x, ...)
   unclass(x) |> as.data.frame()
