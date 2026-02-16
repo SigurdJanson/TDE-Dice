@@ -23,6 +23,9 @@
 #'
 #' @returns A list with 4 vectors: `Critical`, `Success`, `Fail`, `Botch`
 #' (S3 class `CSFB`).
+#'
+#' @seealso \link{cAttr}, \link{cSkill}, \link{CSFB}
+#'
 #' @export
 #'
 #' @examples

@@ -56,6 +56,19 @@ cAttr_BF <- function(eav) {
 #' Determine the probabilities for the outcomes of an attribute check
 #' @param eav effective attribute value
 #' @returns A list with 4 vectors: `Critical`, `Success`, `Fail`, `Botch`.
+
+
+#' cAttr
+#'
+#' Determine the probabilities for the outcomes of an
+#' attribute check.
+#'
+#' @param eav effective attribute value (integer, vector)
+#' @returns A CSFB object with 4 vectors:
+#' `Critical`, `Success`, `Fail`, `Botch`.
+#'
+#' @seealso \link{cCombat}, \link{cSkill}, \link{CSFB}
+#'
 #' @export
 #' @examples cAttr(12)
 cAttr <- function(eav) {

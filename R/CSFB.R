@@ -1,5 +1,7 @@
 .checkTypes <- c("Combat", "Attack", "Parry", "Dodge", "Skill", "Attribute")
 
+#' CSFB
+#'
 #' Creates an object to specify the CSFB outcomes of a
 #' TDE check. CSFB are the 4 values of this check
 #' which are *c*ritical successes, regular *s*uccesses,
@@ -12,6 +14,8 @@
 #' @returns a `CSFB` object is a list with
 #' the four probability vectors and a string to identify the
 #' type of the check.
+#'
+#' @name CSFB
 #'
 #' @export
 #'
@@ -41,7 +45,7 @@ newCSFB <- function(cr, su, fa, bo, check = .checkTypes) {
 }
 
 
-#' @describeIn newCSFB S3 method for class 'CSFB'
+#' @describeIn CSFB S3 method for class 'CSFB'
 #' @param x object of class `CSFB`.
 #' @export
 is.CSFB <- function(x)
@@ -52,7 +56,7 @@ is.CSFB <- function(x)
   all(names(x) == c("Critical", "Success", "Fail", "Botch"))
 
 
-#' @describeIn newCSFB S3 method for class 'CSFB'
+#' @describeIn CSFB S3 method for class 'CSFB'
 #' @param x object of class `CSFB`.
 #' @param digits the minimum number of significant digits to be used:
 #' see print.default.
@@ -91,7 +95,7 @@ print.CSFB <- function(x, digits = NULL, quote = FALSE,
 }
 
 
-#' @describeIn newCSFB S3 method to coerce object to data frame
+#' @describeIn CSFB S3 method to coerce object to data frame
 #' @param x object to be coerced to `CSFB`
 #' @returns `as.data.frame.CSFB` returns a data frame
 as.data.frame.CSFB <- function(x, ...)
