@@ -5,10 +5,10 @@ cAttr_BF <- function(eav) {
   stopifnot(eav > 0)
 
   result <- list(
-    Critical = 0.0,
-    Success = 0.0,
-    Fail = 0.0,
-    Botch = 0.0
+    Critical = rep(0.0, length(eav)),
+    Success = rep(0.0, length(eav)),
+    Fail = rep(0.0, length(eav)),
+    Botch = rep(0.0, length(eav))
   )
 
   TotalEvents <- 0.0
@@ -16,29 +16,25 @@ cAttr_BF <- function(eav) {
     if (roll == 1L) { # potential critical
       for (confirmRoll in 1L:20) {
         TotalEvents <- TotalEvents + 0.05
-        if (confirmRoll <= eav)
-          result$Critical <- result$Critical + 0.05
-        else
-          result$Success <- result$Success + 0.05
+        testCritical <- confirmRoll <= eav & confirmRoll < 20L
+        result$Critical <- result$Critical + ifelse(testCritical, 0.05, 0)
+        result$Success <- result$Success + ifelse(testCritical, 0, 0.05)
       }
     }
-
     else if (roll == 20L) { # potential botch
       for (confirmRoll in 1L:20) {
         TotalEvents <- TotalEvents + 0.05
-        if (confirmRoll <= eav && confirmRoll != 20L)
-          result$Fail <- result$Fail + 0.05
-        else
-          result$Botch <- result$Botch + 0.05
+        testBotch <- confirmRoll > eav | confirmRoll == 20L
+        result$Botch <- result$Botch + ifelse(testBotch, 0.05, 0)
+        result$Fail <- result$Fail + ifelse(testBotch, 0, 0.05)
       }
     }
 
     else { # regular roll
       TotalEvents <- TotalEvents + 1L
-      if (roll <= eav)
-        result$Success <- result$Success + 1L
-      else
-        result$Fail <- result$Fail + 1L
+      testCheck <- roll <= eav & roll < 20L
+      result$Success <- result$Success + ifelse(testCheck, 1, 0)
+      result$Fail <- result$Fail + ifelse(testCheck, 0, 1)
     }
   }
 
