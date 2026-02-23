@@ -1,16 +1,18 @@
 # TODO : implement botch level
 
-#' Hit Point Limits
+#' HitPointLimits
 #'
 #' Helpers to determine the lowest and the highest possible
 #' hit points.
 #' @returns `.minHP` is an integer >= 0. `.maxHP` is an integer
 #' with `.maxHP > .minHP`.
-#' @noRd
 #' @name HitPointLimits
+#' @noRd
 #' @keywords internal
 .minHP <- function(Count, Mod) Count + Mod
-#' @describeIn HitPointLimits maximum hit points
+#'HitPointLimits: Maximum hit points
+#' @noRd
+#' @keywords internal
 .maxHP <- function(Count, Dice, Mod) ((Count * Dice) + Mod) * 2L
 
 
@@ -110,7 +112,9 @@ dhitpoints <- function(x, eav, w, bl = 20L) {
 }
 
 #
-#' @describeIn HitPointDistribution description
+#' @rdname HitPointDistribution
+#' @param lower.tail logical; if TRUE (default), probabilities are
+#' \eqn{X \le x}, otherwise, \eqn{X \ge x}.
 phitpoints <- function(q, eav, w, bl = 20L, lower.tail = TRUE) {
   maxHP <- .maxHP(w["Count"], w["Dice"], w["Mod"])
   if (lower.tail)
@@ -127,7 +131,7 @@ phitpoints <- function(q, eav, w, bl = 20L, lower.tail = TRUE) {
 }
 
 
-#' @describeIn HitPointDistribution description
+#' @rdname HitPointDistribution
 #' @param p vector of probabilities.
 qhitpoints <- function(p, eav, w, bl = 20L, lower.tail = TRUE) {
   stopifnot(`'eav' must be a scalar within 1-20` =
@@ -144,7 +148,7 @@ qhitpoints <- function(p, eav, w, bl = 20L, lower.tail = TRUE) {
 
 
 
-#' @describeIn HitPointDistribution description
+#' @rdname HitPointDistribution
 #' @param n number of observations. If `length(n) > 1`,
 #' the length is taken to be the number required.
 rhitpoints <- function(n, eav, w, bl = 20L) {
