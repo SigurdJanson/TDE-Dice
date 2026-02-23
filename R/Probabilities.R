@@ -96,16 +96,16 @@ cSkill <- function(eav, skill) {
   eav <- pmin(eav, maxd20)
 
   threshold <- min(sum(eav) + skill, max3d20) # separates successes from fails
-  distr <- dSkill(1:60, eav, skill)
+  distr <- dSkillPurged(1:60, eav, skill)
 
   return(newCSFB(
-    cr = (3*19 + 1) / totalEvents,
-    su = sum(distr[1:threshold]),
+    cr = .pSkillCriticals,
+    su = sum(distr[1L:threshold]),
     fa = if (threshold < max3d20)
       sum(distr[(threshold+1L):max3d20])
     else
       0.0,
-    bo = (3*19 + 1) / totalEvents,
+    bo = .pSkillBotches,
     check = "Skill")
   )
 }
