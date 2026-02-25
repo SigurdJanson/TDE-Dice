@@ -253,3 +253,22 @@ dql <- function(x, eav, skill, format = c("vector", "df")) {
     return(setNames(result$p, result$QL)[x+1L])
 }
 
+
+#' @rdname QualityLevels
+#' @export
+rql <- function(n, eav, skill) {
+  stopifnot(`'eav' must be a scalar within 1-20` =
+              length(eav) == 3L, all(eav >= 1) && all(eav <= 20))
+
+  if (length(n) > 1L)
+    n <- length(n)
+  else if (length(n) == 0L || n == 0L)
+    return(integer())
+  else if (n < 0)
+    stop("'n' must be greater than 0")
+
+  p <- dql(0:.maxql, eav, skill)
+  sample(0:.maxql, n, replace=TRUE, prob = p)
+}
+
+
