@@ -184,3 +184,72 @@ dSkillPurged <- function(x, eav, skill, format = c("vector", "df")) {
 }
 
 
+
+
+
+#' QualityLevels
+#'
+#' Density, distribution function, quantile function and random
+#' generation for the probability distribution
+#' of quality levels of a skill check defined by effective attributes
+#' (`eav`) and  a `skill` rating.
+#'
+#' @details "When making skill checks, the player has a pool of
+#' skill points (SP), equal to the skill rating (SR) of the skill
+#' in question, which can be spent to adjust failed die
+#' rolls into successes. Leftover SP determine the QL" (Ulisses).
+#' A failed skill check is identified by quality level of 0.
+#'
+#' @inheritParams dSkillPurged
+#'
+#' @param x,q vector of quantiles, the number of skill points
+#' (integer, 0 <= x <= `r .maxql`).
+#' @param p	vector of probabilities.
+#' @param n	number of observations. If `length(n) > 1`, the length
+#' is taken to be the number required.
+#' @param lower.tail logical; if TRUE (default), probabilities are
+#' \eqn{X \le x}, otherwise, \eqn{X \ge x}.
+#'
+#' @returns The result depends on the `format` argument.
+#' \describe{
+#'   \item{vector}{This is a vector of probabilities. The names of the
+#'   vector elements denote the quality levels.}
+#'   \item{df}{A data frame with the columns:
+#'   Outcome (each sum of dice), `p` (probability for this outcome),
+#'   `Remainder` (remaining skill points), `QL` (the quality level)}
+#' }
+#'
+#' @references ('The Dark Eye' Game reference)[https://tde.ulisses-regelwiki.de/checks.html]
+#' @export
+#' @name QualityLevels
+#'
+#' @examples
+#' dql(0:6, c(9, 10, 11), 8)
+dql <- function(x, eav, skill, format = c("vector", "df")) {
+  if (any(x < 0L | x > .maxql))
+    stop("Quality levels are only defined for 0-6")
+  # Arguments will be validated by `dSkillPurged()`
+  format <- match.arg(format)
+
+  data <- dSkillPurged(NA, eav, skill, "df")
+  ql <- aggregate(p ~ QL, data, sum)
+  # Add botches to 0 remaining skill points
+  maxqlfound <- max(ql$QL)
+  ql[ql$QL == min(ql$QL), "p"] <- ql[ql$QL == min(ql$QL), "p"] + .pSkillBotches
+  ql[ql$QL == maxqlfound, "p"] <- ql[ql$QL == maxqlfound, "p"] + .pSkillCriticals
+
+
+  # 1. Create a reference data frame with all 7 levels
+  allLevels <- data.frame(QL=.qlfactor(0:.maxql))
+  # 2. Merge with your existing data (df)
+  # This keeps all levels from allLevels even if missing in df
+  result <- merge(allLevels, ql[, c("p", "QL")], by = "QL", all.x = TRUE)
+  result$p[is.na(result$p)] <- 0 # replace NAs in 'p' with 0
+  result <- result[order(result$QL), ] # sort
+
+  if (format == "df")
+    return(result[x+1L,])
+  else
+    return(setNames(result$p, result$QL)[x+1L])
+}
+
