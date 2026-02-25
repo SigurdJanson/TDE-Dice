@@ -13,7 +13,7 @@ test_that("function returns consistent results with consistent seed", {
 })
 
 
-test_that("outcomes are between 1 and 12", {
+test_that("outcomes are between 0 and 12", {
   eav <- sample(1:20, 1)
   weapon <- c(Count = 1, Dice = 6, Mod = 0)
   results <- replicate(200, rhitpoints(1, eav, weapon))
