@@ -2,17 +2,37 @@
 % Please edit documentation in R/Probabilities.R
 \name{d3D20}
 \alias{d3D20}
-\title{The density function for rolling a sum of 3d20.}
+\alias{crit3d20}
+\alias{botch3d20}
+\title{d3D20}
 \usage{
 d3D20(x)
+
+crit3d20(eav)
+
+botch3d20(eav)
 }
 \arguments{
 \item{x}{A vector of dice sums.}
+
+\item{eav}{effective attribute value}
 }
 \value{
-The vector of length 60 starts with indices 1 and 2,
-both of which are zero because 3d20 has a sum of at least 3.
+The vector of length 60 starts with index 1,
+Index 1 and 2 are both zero because 3d20 have a sum of
+at least 3.
 }
 \description{
 The density function for rolling a sum of 3d20.
 }
+\section{Functions}{
+\itemize{
+\item \code{crit3d20()}: Distribution of critical successes
+in a 3d20 which are defined by at least two instances
+of a 1 in that roll.
+
+\item \code{botch3d20()}: Distribution of botches
+in a 3d20 which are defined by at least two instances
+of a 1 in that roll.
+
+}}
