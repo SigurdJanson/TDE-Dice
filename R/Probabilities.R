@@ -237,9 +237,14 @@ dql <- function(x, eav, skill, format = c("vector", "df")) {
 
   data <- dSkillPurged(NA, eav, skill, "df")
   ql <- aggregate(p ~ QL, data, sum)
+  ql <- aggregate(p ~ QL, data, sum, drop = FALSE)
+  # max and min QL
+  maxqlfound <- max(ql$QL[!is.na(ql$p)])
+  qlZero <- levels(ql$QL)[1]
+  # Fix the data frame: aggregate `drop=F` fills missing levels with NA
+  ql$p[is.na(ql$p)] <- 0.0
   # Add botches to 0 remaining skill points
-  maxqlfound <- max(ql$QL)
-  ql[ql$QL == min(ql$QL), "p"] <- ql[ql$QL == min(ql$QL), "p"] + .pSkillBotches
+  ql[ql$QL == qlZero, "p"] <- ql[ql$QL == qlZero, "p"] + .pSkillBotches
   ql[ql$QL == maxqlfound, "p"] <- ql[ql$QL == maxqlfound, "p"] + .pSkillCriticals
 
 

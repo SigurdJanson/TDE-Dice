@@ -8,6 +8,7 @@ test_that("7, 14, 11 + 7 vector output matches http://dsa5.mueller-kalthoff.com/
              c("Failed", paste0("QL", 1:6)))
   )
 })
+
 test_that("7, 14, 11 + 7 data frame output matches http://dsa5.mueller-kalthoff.com/", {
   eav <- c(7, 14, 11)
   skill <- 7
@@ -24,7 +25,6 @@ test_that("7, 14, 11 + 7 data frame output matches http://dsa5.mueller-kalthoff.
 #
 # BOUNDARIES
 #
-
 test_that("1, 1, 1 + 0  matches http://dsa5.mueller-kalthoff.com/", {
   eav <- c(1, 1, 1)
   skill <- 0
@@ -69,6 +69,17 @@ test_that("1, 1, 1 + 0 works matches http://dsa5.mueller-kalthoff.com/", {
   expect_equal(
     dql(0:6, eav, skill),
     setNames(c(1-0.007250, 0.007250, rep(0, 5)),
+             c("Failed", paste0("QL", 1:6)))
+  )
+})
+
+# 1-6 = 99.2750%
+test_that("20, 20, 20 + 20 works matches http://dsa5.mueller-kalthoff.com/", {
+  eav <- c(20, 20, 20)
+  skill <- 20
+  expect_equal(
+    dql(0:6, eav, skill),
+    setNames(c(1-0.992750, rep(0, 5L), 0.992750),
              c("Failed", paste0("QL", 1:6)))
   )
 })
