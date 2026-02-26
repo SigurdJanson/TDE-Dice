@@ -265,6 +265,33 @@ dql <- function(x, eav, skill, format = c("vector", "df")) {
 
 #' @rdname QualityLevels
 #' @export
+pql <- function(q, eav, skill, lower.tail = TRUE, format = c("vector", "df")) {
+  format <- match.arg(format)
+  if (lower.tail)
+    select <- 0:max(q)
+  else
+    select <- 0:.maxql
+
+  dql <- dql(select, eav, skill, format = format)
+  if (format == "vector") {
+    if (lower.tail)
+      result <- cumsum(dql) # cumsum preserves names
+    else
+      result <- rev(cumsum(rev(dql)))
+    result <- result[q+1L]
+  } else if (format == "df") {
+    result <- dql
+    if (lower.tail)
+      result$p <- cumsum(dql$p) # cumsum preserves names
+    else
+      result$p <- rev(cumsum(rev(dql$p)))
+    result <- result[q+1L,]
+  }
+  return(result)
+}
+
+#' @rdname QualityLevels
+#' @export
 rql <- function(n, eav, skill) {
   stopifnot(`'eav' must be a scalar within 1-20` =
               length(eav) == 3L, all(eav >= 1) && all(eav <= 20))
