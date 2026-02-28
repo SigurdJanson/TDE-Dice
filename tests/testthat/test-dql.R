@@ -129,8 +129,8 @@ test_that("x < 0 throws exception", {
 
 
 # eav less than 1
-test_that("eav[i] < 0 throws exception", {
-  eav <- sample(c(1, -10, 20)) # regardless of the order
+test_that("eav[i] <= 0 throws exception", {
+  eav <- sample(c(1, 0, 20)) # regardless of the order
   skill <- 11
   expect_error(
     dql(1, eav, skill)
