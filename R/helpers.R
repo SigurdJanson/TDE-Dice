@@ -1,3 +1,40 @@
+
+#' findFirstGE
+#'
+#' Find the first index `i` in `x` for which `x[i] >= target` holds true.
+#' @param x A numeric vector with monotonously increasing values.
+#' @param target A numeric vector.
+#' @details This is a helper function for quantile functions.
+#' It also works outside the value range [0, 1], but has been tested
+#' most extensively within this range.
+#' @returns For each target it returns the first `x[i]` (from left to right)
+#' for which `x[i] >= target` holds true.
+#' If `target` is greater than any `x`, it returns `NA`.
+Rcpp::cppFunction('
+  IntegerVector findFirstGE(NumericVector x, NumericVector target) {
+    int xn = x.size();
+    if (xn == 0) return Rcpp::IntegerVector();
+    int tn = target.size();
+
+    Rcpp::IntegerVector result(tn, NA_INTEGER);
+    int totalFound = 0;
+
+    for (int i = 0; i < xn; i++) {
+      if (totalFound == tn) return result;
+
+      for (int t = 0; t < tn; t++) {
+        if (IntegerVector::is_na(result[t]) && x[i] >= target[t]) {
+          if (!NumericVector::is_na(target[t]))
+            result[t] = i + 1; // R is 1-indexed
+          totalFound++;
+        }
+      }
+    }
+    return result;
+  }
+')
+
+
 #' The break points needed to determine the quality level based on
 #' a number of skill points.
 qualityLevelBreakPoints <- c(4L, 7L, 10L, 13L, 16L)
