@@ -229,7 +229,6 @@ dql <- function(x, eav, skill, format = c("vector", "df")) {
   format <- match.arg(format)
 
   data <- dSkillPurged(NA, eav, skill, "df")
-  ql <- aggregate(p ~ QL, data, sum)
   ql <- aggregate(p ~ QL, data, sum, drop = FALSE)
   # max and min QL
   maxqlfound <- max(ql$QL[!is.na(ql$p)])
