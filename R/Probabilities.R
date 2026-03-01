@@ -3,9 +3,9 @@
 maxd20 <- 20L # max faces of a d20
 max3d20 <- 60L # the maximum sum of 3d20
 totalEvents <- 8000L # total number of events with 3d20
-
 .pSkillCriticals <- 58/8000
 .pSkillBotches   <- 58/8000
+.maxql <- 6L # max quality level
 
 #' d3D20
 #'
