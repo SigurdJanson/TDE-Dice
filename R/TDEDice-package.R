@@ -1,4 +1,5 @@
 #' @keywords internal
+#' @useDynLib TDEDice
 "_PACKAGE"
 
 ## usethis namespace: start
