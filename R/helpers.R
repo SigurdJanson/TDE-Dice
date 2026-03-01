@@ -66,6 +66,12 @@ qualityLevel <- function(sp)
     findInterval(sp, vec = qualityLevelBreakPoints) + 1L,
     0L)
 
+#' Create an ordered factor for quality levels
+.qlfactor <- function(x)
+  factor(x,
+         levels = c(0:.maxql),
+         labels = c("Failed", paste0("QL", 1:.maxql)),
+         ordered = TRUE)
 
 
 #' Get the width of bins when binning remaining skill points.
