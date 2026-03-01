@@ -128,8 +128,8 @@ test_that("Empty `target` returns empty result", {
   expect_equal(findFirstGE(x, target), numeric())
 })
 
-test_that("`target = NA` returns NA", {
-  target <- NA
+test_that("`target = NA` (but still numeric) returns NA", {
+  target <- NA_integer_
   x <- seq(0.0, 1.0, 0.13)
   expect_equal(findFirstGE(x, target), NA_real_)
 })
@@ -166,6 +166,7 @@ test_that("`x` is not a vector", {
 
   expect_error(findFirstGE(x, target))
 })
+
 test_that("`x` is not numeric", {
   target <- 0.6
   x <- seq(0.0, 1.0, 0.1) |> as.character()
