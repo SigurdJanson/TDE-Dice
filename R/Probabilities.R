@@ -118,7 +118,8 @@ cSkill <- function(eav, skill) {
 
 
 
-#' The likelihood for the outcomes of a skill check.
+#' dSkillPurged
+#'
 #' The likelihood for the outcomes of a skill check **excluding** critical
 #' successes and botches.
 #'
@@ -162,10 +163,8 @@ dSkillPurged <- function(x, eav, skill, format = c("vector", "df")) {
       skillRemainder <- (skill-1):0
     else
       skillRemainder <- integer()
-    skillRemainder <- c(rep(skill, sum(eav)), skillRemainder)[1:max3d20]
     skillRemainder <- c(rep(skill, sum(eav)), skillRemainder)
     if (length(skillRemainder) < max3d20)
-      skillRemainder <- c(skillRemainder, rep(0L, max3d20-length(skillRemainder)))
       skillRemainder <- c(skillRemainder, rep(-1L, max3d20-length(skillRemainder)))
     else
       skillRemainder <- skillRemainder[1:max3d20]
@@ -173,10 +172,6 @@ dSkillPurged <- function(x, eav, skill, format = c("vector", "df")) {
     data <- data.frame(
       p = distr,
       Outcome = 1L:max3d20,
-      Remainder = factor(skillRemainder),
-      QL = factor(qualityLevel(skillRemainder),
-                  levels = c(1:qualityLevel(skill), "0"),
-                  labels = c(paste0("QL", 1:qualityLevel(skill)), "Failed"))
       Remainder = factor(skillRemainder, ordered = TRUE),
       QL = .qlfactor(qualityLevel(skillRemainder))
     )
