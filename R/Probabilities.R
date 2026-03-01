@@ -31,7 +31,6 @@ d3D20 <- function(x) {
   return(freq[x] / 8000)
 }
 
-# @describeIn d3D20 Distribution of critical successes
 #' @describeIn d3D20 Distribution of critical successes
 #' in a 3d20 which are defined by at least two instances
 #' of a 1 in that roll.
@@ -52,7 +51,6 @@ crit3d20 <- function(eav) {
   return(result)
 }
 
-# @describeIn d3D20 Distribution of botches
 #' @describeIn d3D20 Distribution of botches
 #' in a 3d20 which are defined by at least two instances
 #' of a 1 in that roll.
