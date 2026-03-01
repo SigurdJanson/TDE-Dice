@@ -20,6 +20,7 @@ inc.ordered <- function(x) {
 
 
 
+
 #' The break points needed to determine the quality level based on
 #' a number of skill points.
 qualityLevelBreakPoints <- c(4L, 7L, 10L, 13L, 16L)
@@ -36,6 +37,10 @@ qualityLevel <- function(sp)
     0L)
 
 #' Create an ordered factor for quality levels
+#' @param x An integer vector with values between 0 and 6.
+#' @details This function does not validate its arguments.
+#' @returns 0 is mapped to "Failed" and the levels 1-6 are
+#' assigned to their according quality levels.
 .qlfactor <- function(x)
   factor(x,
          levels = c(0:.maxql),
