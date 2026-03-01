@@ -1,4 +1,23 @@
+#' inc.ordered
 #'
+#' Increase values of an ordered vector to the next higher level.
+#' At the highest level it doesn't increase further.
+#'
+#' @param x An ordered factor
+#' @returns An ordered factor of the same length as `x`.
+#' @keywords internal
+inc.ordered <- function(x) {
+  if (!is.ordered(x))
+    stop("Input must be an ordered factor.")
+
+  pos <- as.integer(x)
+  # Increment but cap at max level
+  pos_next <- pmin(pos + 1, nlevels(x))
+  # Return factor with same levels
+  factor(levels(x)[pos_next], levels = levels(x), ordered = TRUE)
+}
+
+
 
 
 #' The break points needed to determine the quality level based on
