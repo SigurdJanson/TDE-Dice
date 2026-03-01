@@ -290,6 +290,33 @@ pql <- function(q, eav, skill, lower.tail = TRUE, format = c("vector", "df")) {
   return(result)
 }
 
+
+#' @rdname QualityLevels
+#' @export
+qql <- function(p, eav, skill, lower.tail = TRUE, format = c("vector", "df")) {
+  stopifnot(!is.null(p) && !anyNA(p))
+  if (any(p < 0 | p > 1)) stop("p must be between 0 and 1")
+
+  format <- match.arg(format)
+  # if (!lower.tail) {
+  #   p <- 1 - p
+  # }
+  pql <- pql(0:.maxql, eav, skill, lower.tail = lower.tail, format = format)
+
+  if (format == "vector") {
+    result <- findFirstGE(pql, p, forward = lower.tail)
+    return(setNames(result, p))
+  } else {
+    result <- findFirstGE(pql$p, p, forward = lower.tail)
+    pql <- pql[result,]
+    pql$p <- p
+    row.names(pql) <- p
+    return(pql)
+  }
+  result
+}
+
+
 #' @rdname QualityLevels
 #' @export
 rql <- function(n, eav, skill) {
