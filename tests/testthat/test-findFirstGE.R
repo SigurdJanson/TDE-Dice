@@ -11,6 +11,19 @@ test_that("exact matches return according index", {
   }
 })
 
+test_that("exact matches return according index, backwards", {
+  targets <- c(0.0, 0.3, 0.5, 0.9, 1.0)
+  x <- seq(1.0, 0.0, -0.1)
+
+  for (i in seq_along(targets)) {
+    expect_equal(
+      findFirstGE(x, targets[i], FALSE),
+      which(abs(x - targets[i]) < .Machine$double.eps^0.5),
+      info = paste0("target=", targets[i])
+    )
+  }
+})
+
 
 test_that("Slightly higher targets return index + 1", {
   # do not test 1.0 because that would exceed the range of `x`
@@ -21,6 +34,21 @@ test_that("Slightly higher targets return index + 1", {
     expect_equal(
       findFirstGE(x, targets[i] + 0.0001),
       which(abs(x - targets[i]) < .Machine$double.eps^0.5) + 1L,
+      info = paste0("target=", targets[i])
+    )
+  }
+})
+
+
+test_that("Slightly higher targets return index - 1, backwards", {
+  # do not test 1.0 because that would exceed the range of `x`
+  targets <- c(0.0, 0.3, 0.5, 0.9)
+  x <- seq(1.0, 0.0, -0.1)
+
+  for (i in seq_along(targets)) {
+    expect_equal(
+      findFirstGE(x, targets[i] + 0.0001, forward = FALSE),
+      which(abs(x - targets[i]) < .Machine$double.eps^0.5) - 1L,
       info = paste0("target=", targets[i])
     )
   }
@@ -40,7 +68,18 @@ test_that("Slightly lower targets return same index", {
   }
 })
 
+test_that("Slightly lower targets return same index, backwards", {
+  targets <- c(0.0, 0.3, 0.5, 0.9, 1.0)
+  x <- seq(1.0, 0.0, -0.1)
 
+  for (i in seq_along(targets)) {
+    expect_equal(
+      findFirstGE(x, targets[i] - 0.0001, forward = FALSE),
+      which(abs(x - targets[i]) < .Machine$double.eps^0.5),
+      info = paste0("t=", t)
+    )
+  }
+})
 
 
 #
@@ -62,6 +101,13 @@ test_that("Greater than `max(x)` returns `NA`", {
   x <- seq(0.0, 1.0, (max-min) / 12)
 
   expect_equal(findFirstGE(x, max + Precision), NA_integer_)
+})
+
+test_that("Works with `length(x) == 1`", {
+  x <- 0.5
+
+  expect_equal(findFirstGE(x, 0.4), 1)
+  expect_equal(findFirstGE(x, 0.6), NA_integer_)
 })
 
 

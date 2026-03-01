@@ -7,11 +7,18 @@
 #' @details This is a helper function for quantile functions.
 #' It also works outside the value range [0, 1], but has been tested
 #' most extensively within this range.
+#'
+#' The comparison uses a precision of 1E-8.
 #' @returns For each target it returns the first `x[i]` (from left to right)
 #' for which `x[i] >= target` holds true.
 #' If `target` is greater than any `x`, it returns `NA`.
 Rcpp::cppFunction('
   IntegerVector findFirstGE(NumericVector x, NumericVector target) {
+
+    auto ge = [eps](double x1, double x2) {
+      return x1 > x2 || fabs(x1 - x2) < eps;
+    };
+
     int xn = x.size();
     if (xn == 0) return Rcpp::IntegerVector();
     int tn = target.size();
@@ -20,16 +27,25 @@ Rcpp::cppFunction('
     int totalFound = 0;
 
     for (int i = 0; i < xn; i++) {
+    int starti, endi, stepi;
+    if (forward) {
+      starti = 0; endi = xn - 1; stepi = +1;
+    } else {
+      starti = xn - 1; endi = 0; stepi = -1;
+    }
+    //Rcout << \"starti : \" << starti << \" -|- endi : \" << endi << \"\\n\" << \"stepi : \" << stepi;
+
       if (totalFound == tn) return result;
 
       for (int t = 0; t < tn; t++) {
-        if (IntegerVector::is_na(result[t]) && x[i] >= target[t]) {
-          if (!NumericVector::is_na(target[t]))
             result[t] = i + 1; // R is 1-indexed
           totalFound++;
         }
       }
     }
+
+//    if (!forward)
+//      Rcout << \"The value of totalFound : \" << totalFound << \"\\n\";
     return result;
   }
 ')
