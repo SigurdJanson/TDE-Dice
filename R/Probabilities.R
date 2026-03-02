@@ -327,3 +327,64 @@ rql <- function(n, eav, skill) {
 }
 
 
+
+
+#' The likelihood for the outcomes of a skill check.
+#'
+#' @param s1,s2,s3 effective attribute
+#' @details Uses a brute force algorithm. It is intended for analysis purposes
+#' rather than practical use.
+#' @returns A vector of length 3*20. Each place represent the
+#' number of events for the sum of dice.
+#' @export
+#'
+#' @examples
+#' dSkill_BF(7, 10, 13)
+dSkill_BF <- function(eav, skill) {
+  stopifnot(length(eav) == 3L)
+  stopifnot(all(eav > 0))
+  stopifnot(skill >= 0)
+
+  # Cap input parameters at `maxd20`
+  s1 <- min(eav[1L], maxd20)
+  s2 <- min(eav[2L], maxd20)
+  s3 <- min(eav[3L], maxd20)
+  totalPoints <- s1 + s2 + s3 + skill
+
+  # Generate all 8,000 combinations of three D20 rolls (1:20) as a matrix
+  rolls <- expand.grid(a = 1:maxd20, b = 1:maxd20, c = 1:maxd20, KEEP.OUT.ATTRS = FALSE)
+
+  # Vectorized check: TRUE when at least two dice show 1 (critical failure condition)
+  # two_ones <- (rolls$a == 1L & rolls$b == 1L) |
+  #   (rolls$b == 1L & rolls$c == 1L) |
+  #   (rolls$a == 1L & rolls$c == 1L)
+  two_ones <- rowSums(rolls == 1L) > 1L
+  two_twenties <- rowSums(rolls == 20L) > 1L
+
+  # DEBUG
+  stopifnot(sum(two_ones) == 58L)
+  stopifnot(sum(two_twenties) == 58L)
+
+  # Compute sums efficiently:
+  # - Critical failure: use fixed sum of lower bounds
+  # - Otherwise: sum of each roll clamped to its respective lower bound
+  sums <- ifelse(
+    two_ones,
+    skill,
+    ifelse(
+      two_twenties,
+      -1,
+      totalPoints - (pmax(rolls$a, s1) + pmax(rolls$b, s2) + pmax(rolls$c, s3))
+      )
+    )
+
+  # Tabulate frequencies into a vector of length 60 (sums 1-60)
+  # tabulate() automatically bins integer values 1:nbins with 1-based indexing
+  result <- table(sums)
+  Negatives <- sum(result[names(result) < 0])
+  result <- result[names(result) >= 0]
+  result <- c(`-x` = Negatives, result)
+
+    #---tabulate(sums, nbins = 3L * maxd20 + 1L)
+  return(result)
+}
