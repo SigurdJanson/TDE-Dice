@@ -124,7 +124,7 @@ cSkill <- function(eav, skill) {
 #' @param x A vector of dice sums.
 #' @param eav A vector with 3 places, each being an effective
 #' attribute value.
-#' @param skill The skill value
+#' @param skill The skill level
 #' @param format Determines how the output is generated, one of
 #'
 #'
@@ -134,14 +134,17 @@ cSkill <- function(eav, skill) {
 #'   vector elements denote the sum of dice.}
 #'   \item{df}{A data frame with the columns:
 #'   Outcome (each sum of dice), `p` (probability for this outcome),
-#'   `Remainder` (remaining skill points), `QL` (the quality level)}
+#'   `Remainder` (remaining skill points, with all failed checks being
+#'   projected to a skill point remainder of `-1`.), `QL` (the quality level)}
 #' }
-#' Each vector lists the probabilities for the given `x`.
+#' Each vector lists the probabilities for the given sum of 3d20 `x`. </br>
+#'
 #'
 #' @export
 dSkillPurged <- function(x, eav, skill, format = c("vector", "df")) {
   stopifnot(length(eav) == 3L)
   stopifnot(all(eav > 0L))
+  stopifnot(skill >= 0)
   format <- match.arg(format)
 
   #
