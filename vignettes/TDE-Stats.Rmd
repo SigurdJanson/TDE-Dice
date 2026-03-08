@@ -1,0 +1,81 @@
+---
+title: "The Stats behind A Dark Eye"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{The Stats behind A Dark Eye}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(TDEDice)
+```
+
+
+# Attributes
+
+The [attribute check](https://tde.ulisses-regelwiki.de/checks.html):
+* Roll a d20 against the effective attribute value (eav).
+* Case 1 `d == 1`: a potential critical success is confirmed with another roll against the eav.
+  * 1a. Confirmation roll `c <= eav` is a critical success.
+  * 1b. Confirmation roll `c > eav` or `x == 20` is a common success.
+* Case 2 `d == 20`: 
+
+Hence, the effective attribute higher than 19 must still be treated like a 19 because the 20 is always considered a potential failure. An attribute of 20 still makes sense to compensate for penalties. But for the check it is limited.
+
+## Critical Successes
+$$
+a = min(eav, 19) \newline
+p_{1}(a) = \frac{1}{20} \cdot \frac{a}{20} =  \frac{a}{400}
+$$
+
+## Botches
+$$
+p_{20}(a) = \frac{1}{20} \cdot \frac{20-a}{20} = \frac{20-a}{400}
+$$
+
+## (Regular) Successes
+$$
+p_{s}(a) = \frac{a}{20} - p_{1}(a) = \frac{a}{20} -  \frac{a}{400} = \frac{20a}{400} -  \frac{a}{400} = \frac{19a}{400}
+$$
+
+## Failures
+$$
+p_{f}(a) = \frac{20-a}{20} - p_{20}(a) = \frac{20-a}{20} -  \frac{20-a}{400} = \frac{400-20a}{400} -  \frac{20-a}{400} = \frac{380 - 19a}{400}
+$$
+
+
+
+# Skill Checks
+
+To identify the proper maths for skill checks we have to take into account that we treat a die roll below it's effective attribute value different from a roll above. Because in the end we are not interested in the dices faces. We are interested in the remaining skill points. When a result is above the eav, we lose skill points. But when it is below we do not gain any.
+
+## Background
+
+There are `r eavcombis <- 1540; eavcombis` combinations of 3 attribute values for a skill.
+
+This is the result of choosing 3 values from 1 to 20 with replacement. Each eav may have the same value, hence, it must be chosen and the put back for the next eav.
+
+Given:
+$$
+n = \text{number of distinct items to choose from} = 20  \newline
+r = \text{number of items chosen} = 3
+$$
+This formula in R gives us the number of permutations:
+
+```r
+n <- 20; r <- 3L
+factorial(n+r-1) / (factorial(r) * factorial(n-1))
+#> [1] 1540
+```
+You can check it out here: https://www.graphcalc.com/combinations-replacement-calculator/.
+
+Each of these `r eavcombis` combinations has a distinct probability distribution.
+
