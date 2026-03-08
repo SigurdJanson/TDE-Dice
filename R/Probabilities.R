@@ -454,13 +454,10 @@ dSkill_BF <- function(eav, skill) {
       )
     )
 
-  # Tabulate frequencies into a vector of length 60 (sums 1-60)
-  # tabulate() automatically bins integer values 1:nbins with 1-based indexing
   result <- table(sums)
   Negatives <- sum(result[names(result) < 0])
   result <- result[names(result) >= 0]
-  result <- c(`-x` = Negatives, result)
+  result <- c(Negatives, result) |> setNames(c("Failed", 0:skill))
 
-    #---tabulate(sums, nbins = 3L * maxd20 + 1L)
   return(result)
 }
