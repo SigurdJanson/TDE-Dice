@@ -115,7 +115,7 @@ print.Dice <- function(x, ...) {
 #' and the names "count" and "face" or a list of those.
 #' It depends on the input and if there is more than 1 die
 #' found.
-#'
+#' @export
 d <- function(x) {
   if (is.character(x)) {
     stopifnot(`'d' converts one die at a time` = length(x) == 1L)
