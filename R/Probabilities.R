@@ -186,6 +186,79 @@ dSkillPurged <- function(x, eav, skill, format = c("vector", "df")) {
 
 
 
+#' SkillPoints
+#'
+#' Determine the probability of remaining skill points for
+#' a skill check.
+#'
+#' @inheritParams dSkillPurged
+#'
+#' @param x,q vector of quantiles, the number of skill points
+#' (integer, 0 <= x <= skill).
+#' @param p	vector of probabilities.
+#' @param n	number of observations. If `length(n) > 1`, the length
+#' is taken to be the number required.
+#' @param lower.tail logical; if TRUE (default), probabilities are
+#' \eqn{X \le x}, otherwise, \eqn{X \ge x}.
+#'
+#' @details The function summarizes all failures under -1 skill points.
+#' @returns The result depends on the `format` argument.
+#' \describe{
+#'   \item{vector}{This is a vector of probabilities. The names of the
+#'   vector elements denote the remaining skill points.}
+#'   \item{df}{A data frame with the columns:
+#'   Outcome (each sum of dice), `p` (probability for this outcome),
+#'   `Remainder` (remaining skill points), `QL` (the quality level)}
+#' }
+#'
+#' @references ['The Dark Eye' Game reference](https://tde.ulisses-regelwiki.de/checks.html)
+#' @export
+#' @name SkillPoints
+#'
+#' @examples
+#' dSkillPoints(0:6, c(9, 10, 11), 8)
+dSkillPoints <- function(x, eav, skill, format = c("vector", "df")) {
+  if (any(x < -1L))
+    stop("Skill points ('x') are greater than 0; use -1 for failures.")
+  # Arguments will be validated by `dSkillPurged()`
+  format <- match.arg(format)
+
+  data <- dSkillPurged(NA, eav, skill, "df")
+  sp <- aggregate(p ~ Remainder, data, sum)
+  # Add botches to 0 remaining skill points
+  if ( !(-1 %in% levels(sp$Remainder)) ) {
+    sp$Remainder <- ordered(sp$Remainder, levels = c(-1, levels(sp$Remainder)))
+    # TODO: Insert p=0 as first row
+    sp[nrow(sp) + 1L,] <- c(NA, NA)
+    sp$p[nrow(sp)] <- 0
+    sp$Remainder[nrow(sp)] <- -1
+    sp <- sp[order(sp$Remainder, decreasing=FALSE), ]
+  }
+  sp[sp$Remainder == -1, "p"] <- sp[sp$Remainder == -1, "p"] + .pSkillBotches
+  sp[sp$Remainder == skill, "p"] <- sp[sp$Remainder == skill, "p"] + .pSkillCriticals
+
+  # subset
+  xr <- sp$Remainder[x+2L] # roughly equal to sp$Remainder[sp$Remainder %in% x]
+  if (anyNA(xr)) { # additional levels beyond the skill level requested
+    # Make sure all 'x'  are in the data
+    template <- data.frame(Remainder = x)
+
+    sp_expanded <- merge(template, sp, by = "Remainder", all.x = TRUE)
+    sp_expanded$p[is.na(sp_expanded$p)] <- 0
+
+    sp <- sp_expanded[sp_expanded$Remainder == x, ]
+  }
+
+  if (format == "df")
+    return(sp)
+  else {
+    # names
+    x <- ordered( x, levels = -1:max(x, skill), labels = c("Failed", 0:max(x, skill)) )
+    return(setNames(sp$p, x))
+  }
+
+}
+
 
 #' QualityLevels
 #'
