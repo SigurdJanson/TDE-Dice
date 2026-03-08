@@ -366,9 +366,7 @@ qql <- function(p, eav, skill, lower.tail = TRUE, format = c("vector", "df")) {
   if (any(p < 0 | p > 1)) stop("p must be between 0 and 1")
 
   format <- match.arg(format)
-  # if (!lower.tail) {
-  #   p <- 1 - p
-  # }
+
   pql <- pql(0:.maxql, eav, skill, lower.tail = lower.tail, format = format)
 
   if (format == "vector") {
