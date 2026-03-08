@@ -1,0 +1,117 @@
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+# TDE-Dice
+
+<!-- badges: start -->
+
+<!-- badges: end -->
+
+TDE-Dice brings the elegant probability mechanics of Germany’s legendary
+RPG [“Das Schwarze
+Auge”](https://ulisses-spiele.de/game-system/das-schwarze-auge/) ([The
+Dark Eye]()<https://ulisses-us.com/games/tde/>) into
+(R)\[<https://www.r-project.org/>\]. Calculate exact success
+probabilities for attribute checks, combat manoeuvres, and skill
+checks—no more guessing whether your hero can scale that castle wall or
+parry the orc chieftain’s axe!
+
+Perfect for: \* Game Masters designing balanced encounters \*
+Statisticians exploring non-standard dice distributions \* Players
+optimizing character builds \* Educators teaching probability with RPG
+examples
+
+## Core Mechanics Made Simple
+
+The Dark Eye uses a unique d20 system with quality levels—where rolling
+under your attribute/skill value succeeds, and lower rolls yield better
+results. Our package handles the complex truncation and rectification
+rules automatically:
+
+Key features: statistics for attribute, skill, and combat checks.<br/>
+
+- R-style probability distributions for attributes, quality levels or
+  skill points of skill checks, hit points of attack checks.
+  - `d...()` for density functions.
+  - `p...()` for distribution functions.
+  - `q...()` for quantile functions.
+  - `r...()` random generation functions.
+- Functions to determine outcomes as success, fail, critical success,
+  botch (with the name pattern `cSkill(...)`, `cAttr(...)` etc.).
+- Basic helper functions for dice rolls to support custom calculations
+  and comparisons (`dSumKdN()`, `convolveDice()`, `qualityLevel()`
+  etc.).
+- Plotting function (`plotAttributeChecks()`, `plotSkillChecks()`) based
+  on [qqplot2](https://ggplot2.tidyverse.org/) supported by extensions
+  of the probability functions to generate data frames.
+
+## Comparative Checks
+
+> *Under development*
+
+What are the chances of **competitive** checks? Who is more likely to
+win? This can be used by game masters to tune the abilities and skill
+levels for NPCs.
+
+What are the chances of **cumulative** checks? Tune opportunities to
+support your plot.
+
+Chances of survival in combat. Give your health points and the weapon
+stats, which character is more likely to survive a fight? Or would your
+opponent escape the situation?
+
+## Simulations
+
+> *Under development*
+
+## Example
+
+This is a basic example which shows you how to solve common questions:
+
+``` r
+library(TDEDice)
+
+# What's the chance a hero with Courage 14 succeeds 
+# on a difficult check (target = 8) with 2 bonus dice?
+cAttr(14)
+#> 1 Attribute check 
+#>  Critical Success  Fail Botch
+#>     0.035   0.665 0.285 0.015
+
+# How good is this weapon? What are the chances of a 
+# weapon hitting an opponent with a certain number of 
+# hit points, excluding their defence?
+dhitpoints(2:12, eav=12, w = c(Count=2, Dice=6, Mod=0))
+#>          2          3          4          5          6          7          8 
+#> 0.01583333 0.03166667 0.04833333 0.06333333 0.08083333 0.09500000 0.08166667 
+#>          9         10         11         12 
+#> 0.06333333 0.05083333 0.03166667 0.02000000
+
+
+# Visualize all possible outcomes for a sword-fighting check
+#plotSkillDistribution(dSkillPoints(0:8, c(7, 10, 13), 8, "df"))
+```
+
+## Installation
+
+You can install the development version of TDEDice from
+[GitHub](https://github.com/) with:
+
+``` r
+# install.packages("pak")
+pak::pak("SigurdJanson/TDE-Dice")
+```
+
+or with `devtools`:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("SigurdJanson/TDE-Dice")
+```
+
+## ⚖️ License
+
+MIT © 2026 Jan seifert. The Dark Eye (Das Schwarze Auge) is a registered
+trademark of Ulisses Spiele GmbH. This package is an unofficial fan tool
+and is not affiliated with or endorsed by Ulisses Spiele or Uhrwerk
+Verlag.
