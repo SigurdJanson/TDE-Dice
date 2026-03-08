@@ -9,11 +9,11 @@
 #' @name HitPointLimits
 #' @noRd
 #' @keywords internal
-.minHP <- function(Count, Mod) Count + Mod
+.minHP <- function(Count, Mod) Count + ifelse(is.na(Mod), 0, Mod)
 #'HitPointLimits: Maximum hit points
 #' @noRd
 #' @keywords internal
-.maxHP <- function(Count, Dice, Mod) ((Count * Dice) + Mod) * 2L
+.maxHP <- function(Count, Dice, Mod) ((Count * Dice) + ifelse(is.na(Mod), 0, Mod)) * 2L
 
 
 
@@ -84,16 +84,16 @@ dhitpoints <- function(x, eav, w, bl = 20L) {
   stopifnot(`Only a single attack value is supported` = length(eav) == 1)
 
   minHP <- .minHP(w["Count"], w["Mod"])
-  maxHP <- .maxHP(w["Count"], w["Dice"], w["Mod"])
+  maxHP <- .maxHP(w["Count"], w["Faces"], w["Mod"])
   stopifnot(`Requested quantiles outside range of distribution` =
               all(1 <= x) && all(x <= maxHP))
 
   if (w["Count"] == 1)
-    dhp <- rep(1/w["Dice"], w["Dice"])
+    dhp <- rep(1/w["Faces"], w["Faces"])
   else if (w["Count"] == 2)
-    dhp <- dSum2dN(w["Dice"]) # for efficiency reasons
+    dhp <- dSum2dN(w["Faces"]) # for efficiency reasons
   else
-    dhp <- dSumKdN(w["Count"], w["Dice"])
+    dhp <- dSumKdN(w["Count"], w["Faces"])
 
   eav <- min(eav, 20L)
   Critical = eav / 400.0 # probability of a critical success
@@ -115,8 +115,9 @@ dhitpoints <- function(x, eav, w, bl = 20L) {
 #' @rdname HitPointDistribution
 #' @param lower.tail logical; if TRUE (default), probabilities are
 #' \eqn{X \le x}, otherwise, \eqn{X \ge x}.
+#' @export
 phitpoints <- function(q, eav, w, bl = 20L, lower.tail = TRUE) {
-  maxHP <- .maxHP(w["Count"], w["Dice"], w["Mod"])
+  maxHP <- .maxHP(w["Count"], w["Faces"], w["Mod"])
   if (lower.tail)
     select <- 1:max(q)
   else
@@ -151,9 +152,12 @@ qhitpoints <- function(p, eav, w, bl = 20L, lower.tail = TRUE) {
 #' @rdname HitPointDistribution
 #' @param n number of observations. If `length(n) > 1`,
 #' the length is taken to be the number required.
+#' @export
 rhitpoints <- function(n, eav, w, bl = 20L) {
-  stopifnot(`'eav' must be a scalar within 1-20` =
-              length(eav) == 1L, eav >= 1 && eav <= 20)
+  # check and prepare arguments
+  stopifnot(`'eav' must be a scalar >= 1` =
+              length(eav) == 1L, eav >= 1)
+  eav <- min(eav, maxd20)
   if (length(n) > 1L)
     n <- length(n)
   else if (length(n) == 0L || n == 0L)
@@ -161,10 +165,12 @@ rhitpoints <- function(n, eav, w, bl = 20L) {
   else if (n < 0)
     stop("'n' must be greater than 0")
 
+  # variables
   minHP <- .minHP(w["Count"], w["Mod"])
-  maxHP <- .maxHP(w["Count"], w["Dice"], w["Mod"])
+  maxHP <- .maxHP(w["Count"], w["Faces"], w["Mod"])
   HP <- minHP:maxHP
 
+  # Logic
   chances <- cCombat(eav, bl)
   p <- dhitpoints(HP, eav, w, bl)
   p <- c(chances$Fail + chances$Botch, p)
