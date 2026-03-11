@@ -7,7 +7,9 @@
 dSkill_BF(eav, skill)
 }
 \arguments{
-\item{s1, s2, s3}{effective attribute}
+\item{eav}{effective attribute values (vector with 3 integer > 0)}
+
+\item{skill}{level (integer >= 0)}
 }
 \value{
 A vector of length 3*20. Each place represent the
@@ -21,5 +23,5 @@ Uses a brute force algorithm. It is intended for analysis purposes
 rather than practical use.
 }
 \examples{
-dSkill_BF(7, 10, 13)
+dSkill_BF(c(7, 10, 13), 4)
 }

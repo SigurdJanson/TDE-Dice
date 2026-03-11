@@ -6,7 +6,7 @@ test_that("10/10/10:2 - matches dsa5.mueller-kalthoff.com", {
   skill <- 2L
 
   # order is reversed!!!
-  expected <- c(`-x` = 0.79325, `0` = 0.040875, `1` = 0.037125, `2` = 0.12875)
+  expected <- c(`Failed` = 0.79325, `0` = 0.040875, `1` = 0.037125, `2` = 0.12875)
 
   expect_equal(
     dSkill_BF(eav, skill),
@@ -22,7 +22,7 @@ test_that("10/10/10:2 - matches dsa5.mueller-kalthoff.com", {
   skill <- 5L
 
   # Note: order is reversed!!! Every additional skill point is added to the left
-  expected <- c(`-x` = 0.50125, `0` = 0.059, `1` = 0.0565, `2` = 0.0635, `3` = 0.05875, `4` = 0.054125, `5` = 0.206875)
+  expected <- c(`Failed` = 0.50125, `0` = 0.059, `1` = 0.0565, `2` = 0.0635, `3` = 0.05875, `4` = 0.054125, `5` = 0.206875)
 
   expect_equal(
     dSkill_BF(eav, skill),
@@ -38,7 +38,7 @@ test_that("19/11/16:8 - matches dsa5.mueller-kalthoff.com", {
   skill <- 8L
 
   # Note: order is reversed!!! Every additional skill point is added to the left
-  expected <- c(`-x` = 0.427125, `0` = 0.059625, `1` = 0.057125, `2` = 0.054625,
+  expected <- c(`Failed` = 0.427125, `0` = 0.059625, `1` = 0.057125, `2` = 0.054625,
                 `3` = 0.052125, `4` = 0.049625, `5` = 0.047125,
                 `6` = 0.044625, `7` = 0.04825, `8` = 0.15975)
 
@@ -54,21 +54,21 @@ test_that("1/1/1:0 & 1 - matches dsa5.mueller-kalthoff.com", {
   eav <- c(1L, 1L, 1L)
   skill <- 0L
 
-  expected <- c(`-x` = 0.99275, `0` = 0.00725)
+  expected <- c(`Failed` = 0.99275, `0` = 0.00725)
   expect_equal(dSkill_BF(eav, skill), expected * 8000)
 
   skill <- 1L
-  expected <- c(`-x` = 0.99275, `1` = 0.00725)
+  expected <- c(`Failed` = 0.99275, `0` = 0.0,  `1` = 0.00725)
   expect_equal(dSkill_BF(eav, skill), expected * 8000)
 })
 
-test_that("20/20/20:0 - matches dsa5.mueller-kalthoff.com", {
+test_that("20/20/20:x - matches dsa5.mueller-kalthoff.com", {
   eav <- c(20L, 20L, 20L)
   skill <- c(0L, 1L, 5L, 20L)
 
   for(s in skill) {
-    expected <- c(0.00725, 0.99275) |> setNames(c("-x", s))
-    expect_equal(dSkill_BF(eav, s), expected * 8000)
+    expected <- c(0.00725, rep(0.0, s), 0.99275) |> setNames(c("Failed", 0:s))
+    expect_equal(dSkill_BF(eav, s), expected * 8000, info = paste0("Skill: ", s))
   }
 })
 

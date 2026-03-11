@@ -405,7 +405,8 @@ rql <- function(n, eav, skill) {
 
 #' The likelihood for the outcomes of a skill check.
 #'
-#' @param s1,s2,s3 effective attribute
+#' @param eav effective attribute values (vector with 3 integer > 0)
+#' @param skill level (integer >= 0)
 #' @details Uses a brute force algorithm. It is intended for analysis purposes
 #' rather than practical use.
 #' @returns A vector of length 3*20. Each place represent the
@@ -413,7 +414,7 @@ rql <- function(n, eav, skill) {
 #' @export
 #'
 #' @examples
-#' dSkill_BF(7, 10, 13)
+#' dSkill_BF(c(7, 10, 13), 4)
 dSkill_BF <- function(eav, skill) {
   stopifnot(length(eav) == 3L)
   stopifnot(all(eav > 0))
@@ -453,9 +454,19 @@ dSkill_BF <- function(eav, skill) {
     )
 
   result <- table(sums)
-  Negatives <- sum(result[names(result) < 0])
-  result <- result[names(result) >= 0]
-  result <- c(Negatives, result) |> setNames(c("Failed", 0:skill))
 
-  return(result)
+  # Fill in missing places
+  intNames <- names(result) |> as.numeric()
+  minName <- min(intNames)
+  maxName <- max(intNames)
+  full_names  <- seq(minName, maxName)
+  result_full <- setNames(rep(0, length(full_names)), full_names)
+  result_full[names(result)] <- result
+
+  # Compress all negative results to -1
+  Negatives <- sum(result_full[names(result_full) < 0])
+  result_full <- result_full[names(result_full) >= 0]
+  result_full <- c(Negatives, result_full) |> setNames(c("Failed", 0:skill))
+
+  return(result_full)
 }
