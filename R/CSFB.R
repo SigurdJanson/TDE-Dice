@@ -98,5 +98,6 @@ print.CSFB <- function(x, digits = NULL, quote = FALSE,
 #' @describeIn CSFB S3 method to coerce object to data frame
 #' @param x object to be coerced to `CSFB`
 #' @returns `as.data.frame.CSFB` returns a data frame
+#' @export
 as.data.frame.CSFB <- function(x, ...)
   unclass(x) |> as.data.frame()
