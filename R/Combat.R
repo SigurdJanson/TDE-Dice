@@ -78,7 +78,7 @@ cCombat <- function(eav, bl = 20L) {
 #' @export
 #'
 #' @examples
-#' dhitpoints(6, 12, c(Count=2, Dice=6, Mod=0))
+#' dhitpoints(6, 12, c(Count=2, Faces=6, Mod=0))
 dhitpoints <- function(x, eav, w, bl = 20L) {
   if(length(x) == 0) return(numeric())
   stopifnot(`Only a single attack value is supported` = length(eav) == 1)
