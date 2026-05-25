@@ -9,7 +9,7 @@
 #' @details This is a helper function for quantile functions.
 #' It may also work outside the value range [0, 1], but has been tested
 #' most extensively within this range.
-#' \itemize{
+#' \describe{
 #' \item{Leading zeroes}{Leading zeroes are ignored.}
 #' \item{Precision}{The comparison uses a precision of 1E-8. Values with differences
 #' smaller than that will be treated as equal.}
