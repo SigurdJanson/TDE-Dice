@@ -1,7 +1,7 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
-// [[Rcpp::interfaces()]]
+// [[Rcpp::interfaces(r)]]
 // [[Rcpp::export("findFirstGE")]]
 IntegerVector findFirstGE(NumericVector x,
                           NumericVector target,
