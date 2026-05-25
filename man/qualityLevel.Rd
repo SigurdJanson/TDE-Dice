@@ -2,9 +2,21 @@
 % Please edit documentation in R/helpers.R
 \name{qualityLevel}
 \alias{qualityLevel}
+\alias{qualityLevel.default}
+\alias{qualityLevel.integer}
+\alias{qualityLevel.numeric}
+\alias{qualityLevel.ordered}
 \title{Determine the quality level based on available skill points.}
 \usage{
 qualityLevel(sp)
+
+\method{qualityLevel}{default}(sp)
+
+\method{qualityLevel}{integer}(sp)
+
+\method{qualityLevel}{numeric}(sp)
+
+\method{qualityLevel}{ordered}(sp)
 }
 \arguments{
 \item{sp}{Skill points (integer)}
@@ -14,5 +26,5 @@ Determine the quality level based on available skill points.
 }
 \details{
 This function does not validate its arguments.
-It's been tested for a value range of [-20, 50].
+It's been tested for a value range of [-20, 20].
 }

@@ -28,13 +28,41 @@ qualityLevelBreakPoints <- c(4L, 7L, 10L, 13L, 16L)
 
 
 #' Determine the quality level based on available skill points.
+#'
 #' @param sp Skill points (integer)
 #' @details This function does not validate its arguments.
-#' It's been tested for a value range of [-20, 50].
+#' It's been tested for a value range of [-20, 20].
+#'
 qualityLevel <- function(sp)
+  UseMethod("qualityLevel")
+
+#' @method qualityLevel default
+#' @rdname qualityLevel
+#' @export
+qualityLevel.default <- function(sp)
+  stop(paste("'qualityLevel' is not defined for class", class(s)))
+
+#' @method qualityLevel integer
+#' @rdname qualityLevel
+#' @export
+qualityLevel.integer <- function(sp)
   ifelse(sp >= 0L,
     findInterval(sp, vec = qualityLevelBreakPoints) + 1L,
     0L)
+
+#' @method qualityLevel numeric
+#' @rdname qualityLevel
+#' @export
+qualityLevel.numeric <- function(sp)
+  qualityLevel.integer(sp)
+
+#' @method qualityLevel ordered
+#' @rdname qualityLevel
+#' @export
+qualityLevel.ordered <- function(sp)
+  qualityLevel.integer(as.integer(sp) - 2L)
+
+
 
 #' Create an ordered factor for quality levels
 #' @param x An integer vector with values between 0 and 6.
