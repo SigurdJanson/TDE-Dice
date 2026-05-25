@@ -56,5 +56,5 @@ The function summarizes all failures under -1 skill points.
 dSkillPoints(0:6, c(9, 10, 11), 8)
 }
 \references{
-['The Dark Eye' Game reference](https://tde.ulisses-regelwiki.de/checks.html)
+\href{https://tde.ulisses-regelwiki.de/checks.html}{'The Dark Eye' Game Reference}
 }

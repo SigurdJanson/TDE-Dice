@@ -211,7 +211,7 @@ dSkillPurged <- function(x, eav, skill, format = c("vector", "df")) {
 #'   `Remainder` (remaining skill points), `QL` (the quality level)}
 #' }
 #'
-#' @references ['The Dark Eye' Game reference](https://tde.ulisses-regelwiki.de/checks.html)
+#' @references \href{https://tde.ulisses-regelwiki.de/checks.html}{'The Dark Eye' Game Reference}
 #' @export
 #' @name SkillPoints
 #'
@@ -292,7 +292,7 @@ dSkillPoints <- function(x, eav, skill, format = c("vector", "df")) {
 #'   `Remainder` (remaining skill points), `QL` (the quality level)}
 #' }
 #'
-#' @references ('The Dark Eye' Game reference)[https://tde.ulisses-regelwiki.de/checks.html]
+#' @references \href{https://tde.ulisses-regelwiki.de/checks.html}{'The Dark Eye' Game Reference}
 #' @export
 #' @name QualityLevels
 #'
