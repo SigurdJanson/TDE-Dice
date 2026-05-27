@@ -2,8 +2,7 @@
 % Please edit documentation in R/Probabilities.R
 \name{dSkillPurged}
 \alias{dSkillPurged}
-\title{The likelihood for the outcomes of a skill check **excluding** critical
-successes and botches.}
+\title{dSkillPurged}
 \usage{
 dSkillPurged(x, eav, skill, format = c("vector", "df"))
 }
@@ -13,7 +12,7 @@ dSkillPurged(x, eav, skill, format = c("vector", "df"))
 \item{eav}{A vector with 3 places, each being an effective
 attribute value.}
 
-\item{skill}{The skill value}
+\item{skill}{The skill level}
 
 \item{format}{Determines how the output is generated, one of}
 }
@@ -24,9 +23,10 @@ The result depends on the `format` argument.
   vector elements denote the sum of dice.}
   \item{df}{A data frame with the columns:
   Outcome (each sum of dice), `p` (probability for this outcome),
-  `Remainder` (remaining skill points), `QL` (the quality level)}
+  `Remainder` (remaining skill points, with all failed checks being
+  projected to a skill point remainder of `-1`.), `QL` (the quality level)}
 }
-Each vector lists the probabilities for the given `x`.
+Each vector lists the probabilities for the given sum of 3d20 `x`. </br>
 }
 \description{
 The likelihood for the outcomes of a skill check **excluding** critical

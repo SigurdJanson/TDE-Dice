@@ -23,7 +23,7 @@ rql(n, eav, skill)
 \item{eav}{A vector with 3 places, each being an effective
 attribute value.}
 
-\item{skill}{The skill value}
+\item{skill}{The skill level}
 
 \item{format}{Determines how the output is generated, one of}
 
@@ -44,6 +44,11 @@ The result depends on the `format` argument.
   Outcome (each sum of dice), `p` (probability for this outcome),
   `Remainder` (remaining skill points), `QL` (the quality level)}
 }
+The length of the result is determined by `n` for `rql`, and is the
+maximum of the lengths of the numerical arguments for the other functions.
+
+The numerical arguments other than `n` are recycled to the length of
+the result. Only the first elements of the logical arguments are used.
 }
 \description{
 Density, distribution function, quantile function and random
@@ -62,5 +67,5 @@ A failed skill check is identified by quality level of 0.
 dql(0:6, c(9, 10, 11), 8)
 }
 \references{
-\href{https://tde.ulisses-regelwiki.de/checks.html}{'The Dark Eye' Game reference}
+\href{https://tde.ulisses-regelwiki.de/checks.html}{'The Dark Eye' Game Reference}
 }

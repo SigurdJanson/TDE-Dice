@@ -260,6 +260,10 @@ dSkillPoints <- function(x, eav, skill, format = c("vector", "df")) {
 }
 
 
+
+## QUALITY LEVELS #####
+
+
 #' QualityLevels
 #'
 #' Density, distribution function, quantile function and random
@@ -291,6 +295,11 @@ dSkillPoints <- function(x, eav, skill, format = c("vector", "df")) {
 #'   Outcome (each sum of dice), `p` (probability for this outcome),
 #'   `Remainder` (remaining skill points), `QL` (the quality level)}
 #' }
+#' The length of the result is determined by `n` for `rql`, and is the
+#' maximum of the lengths of the numerical arguments for the other functions.
+#'
+#' The numerical arguments other than `n` are recycled to the length of
+#' the result. Only the first elements of the logical arguments are used.
 #'
 #' @references \href{https://tde.ulisses-regelwiki.de/checks.html}{'The Dark Eye' Game Reference}
 #' @export
