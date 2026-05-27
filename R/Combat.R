@@ -158,6 +158,7 @@ rhitpoints <- function(n, eav, w, bl = 20L) {
   stopifnot(`'eav' must be a scalar >= 1` =
               length(eav) == 1L, eav >= 1)
   eav <- min(eav, maxd20)
+
   if (length(n) > 1L)
     n <- length(n)
   else if (length(n) == 0L || n == 0L)

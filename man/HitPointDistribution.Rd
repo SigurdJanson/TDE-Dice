@@ -48,7 +48,7 @@ Throws en error when x is empty or outside
 Hit point distribution
 }
 \examples{
-dhitpoints(6, 12, c(Count=2, Dice=6, Mod=0))
+dhitpoints(6, 12, c(Count=2, Faces=6, Mod=0))
 }
 \concept{Discrete}
 \concept{Univariate}
