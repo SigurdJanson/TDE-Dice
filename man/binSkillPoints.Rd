@@ -2,7 +2,7 @@
 % Please edit documentation in R/helpers.R
 \name{binSkillPoints}
 \alias{binSkillPoints}
-\title{Get the width of bins when binning remaining skill points.}
+\title{Skill Point Bins}
 \usage{
 binSkillPoints(sp)
 }

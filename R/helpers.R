@@ -76,6 +76,8 @@ qualityLevel.ordered <- function(sp)
          ordered = TRUE)
 
 
+#' Skill Point Bins
+#'
 #' Get the width of bins when binning remaining skill points.
 #' @param sp Skill points (scalar, integer)
 #' @return A vector starting with the highest quality level.
