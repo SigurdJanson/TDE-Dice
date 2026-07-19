@@ -52,8 +52,23 @@ p_{f}(a) = \frac{20-a}{20} - p_{20}(a) = \frac{20-a}{20} -  \frac{20-a}{400} = \
 $$
 
 
-
+---
 # Skill Checks
+
+```{r SetupSkillBackground}
+
+library(formattable)
+
+library(jsonlite)
+.attrs <- jsonlite::read_json(r"{D:\Programmierung\R\DSA\TDE-Dice\vignettes\attributes_en.json}")$Entries
+dfattrs <- do.call(rbind, lapply(.attrs, as.data.frame))
+rownames(dfattrs) <- NULL  # Remove row names
+
+.skills <- jsonlite::read_json(r"{D:\Programmierung\R\DSA\TDE-Dice\vignettes\skills_en.json}")$Entries
+dfskills <- do.call(rbind, lapply(.skills, as.data.frame))
+rownames(dfskills) <- NULL  # Remove row names
+```
+
 
 To identify the proper maths for skill checks we have to take into account that we treat a die roll below it's effective attribute value different from a roll above. Because in the end we are not interested in the dices faces. We are interested in the remaining skill points. When a result is above the eav, we lose skill points. But when it is below we do not gain any.
 
@@ -78,4 +93,77 @@ factorial(n+r-1) / (factorial(r) * factorial(n-1))
 You can check it out here: https://www.graphcalc.com/combinations-replacement-calculator/.
 
 Each of these `r eavcombis` combinations has a distinct probability distribution.
+
+
+## Attributes of Skill Checks
+
+In total, there are `r length(.skills)` profane skills. Each skill requires 3 attributes for a check. Some attributes are needed more frequently for skill checks than others. The list shows how often an attribute is required in a skill check, with duplicate attributes in a single check counted twice.
+
+```{r AttrUsePerSKill, echo=FALSE}
+attrcount <- dfskills[, paste0("ab", 1:3)] |> 
+  unlist() |>
+  table() |> as.data.frame()
+attrcount$Freq <- color_bar("lightgray")(attrcount$Freq)
+attrcount$Label <- dfattrs$shortname
+attrcount[, c("Var1", "Label", "Freq")] |>
+  knitr::kable(col.names = c("Id", "Name", "Frequency"))
+```
+
+**Doubles**. In addition to the disproportionately frequent use of attributes, there is also an increasing number of instances where the same attribute is used twice in a skill check.
+
+```{r AttrDoubleUsePerSkill, echo=FALSE}
+attrcount <- dfskills[, paste0("ab", 1:3)]
+# Find doubles
+attrcount$doubles <- apply(attrcount, 1L, \(x) if (any(duplicated(x))) x[duplicated(x)] else NA_character_)
+
+attrcount <- table(attrcount$doubles) |> as.data.frame()
+for(a in dfattrs$attrID) {
+  attrcount$Var1 <- sapply(attrcount$Var1, \(x) stringr::str_replace(x, a, dfattrs$shortname[dfattrs$attrID == a]))
+}
+attrcount$Freq <- color_bar("lightgray")(attrcount$Freq)
+knitr::kable(attrcount, col.names = c("Combination", "Frequency"))
+```
+
+
+The repeated use of a single attribute in one skill check raises the question which attribute is needed for the largest set of skill checks? The INT attribute has the widest coverage, closely followed by SGC.
+
+```{r MostUsedAttrAcrossSkill, echo=FALSE}
+attrcount <- dfskills[, paste0("ab", 1:3)]
+attrcount <- sapply(dfattrs$attrID, \(x) rowSums(attrcount[, paste0("ab", 1:3)] == x) > 0 |> sum())
+attrcount <- colSums(attrcount) |> as.data.frame()
+
+rownames(attrcount) <- NULL
+attrcount$Name <- dfattrs$shortname
+attrcount[[1]] <- color_bar("lightgray")(attrcount[[1]])
+knitr::kable(attrcount[c(2, 1)], col.names = c("Name", "Frequency"))
+```
+
+
+
+
+**Triplets**. Finally, even triplets of all three attributes are noteworthily disbalanced. The triplet `SGC/SGC/INT` is the basis of 10 skill checks which makes almost `r round(10/59*100)`% of all skills.
+
+```{r AttrTripleUsePerSKill-Calc, include=FALSE}
+attrcount <- dfskills[, paste0("ab", 1:3)]
+attrcount$triples <- apply(attrcount[, paste0("ab", 1:3)], 1L, \(x) paste0(x, collapse = "/"))
+
+for(a in dfattrs$attrID) {
+  attrcount$triples <- sapply(attrcount$triples, \(x) stringr::str_replace_all(x, a, dfattrs$shortname[dfattrs$attrID == a]))
+}
+
+attrcount <- table(attrcount$triples) |> as.data.frame()
+```
+
+```{r AttrTripleUsePerSKill-Table, echo=FALSE}
+result <- attrcount[attrcount$Freq > 1L,]
+result <- result[order(result$Freq, decreasing = TRUE),]
+result$Freq <- color_bar("lightgray")(result$Freq)
+rownames(result) <- NULL
+
+knitr::kable(result, col.names = c("Combination", "Frequency"))
+rm(result)
+```
+
+These `r length(attrcount[attrcount$Freq == 1L, "Var1"])` combinations are used just once `r paste(attrcount[attrcount$Freq == 1L, "Var1"])`.
+
 
