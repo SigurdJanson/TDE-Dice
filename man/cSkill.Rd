@@ -17,7 +17,8 @@ A CSFB object with 4 vectors:
 `Critical`, `Success`, `Fail`, `Botch`.
 }
 \description{
-cSkill
+Return the aggregated probability for a critical success,
+a regular success, a fail, and a botch.
 }
 \examples{
 cSkill(c(11, 12, 14), 7)

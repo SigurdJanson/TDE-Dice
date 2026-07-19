@@ -53,7 +53,7 @@ crit3d20 <- function(eav) {
 
 #' @describeIn d3D20 Distribution of botches
 #' in a 3d20 which are defined by at least two instances
-#' of a 1 in that roll.
+#' of a 20 in that roll.
 #' @param eav effective attribute value
 #' @export
 botch3d20 <- function(eav) {
@@ -76,7 +76,8 @@ botch3d20 <- function(eav) {
 
 #' cSkill
 #'
-#'
+#' Return the aggregated probability for a critical success,
+#' a regular success, a fail, and a botch.
 #'
 #' @param eav A vector with 3 places, each being an effective
 #' attribute value.

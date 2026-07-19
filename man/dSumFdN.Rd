@@ -2,9 +2,12 @@
 % Please edit documentation in R/DiceSum.R
 \name{dSumFdN}
 \alias{dSumFdN}
+\alias{dSum2dN}
 \title{dSumFdN}
 \usage{
 dSumFdN(f = 2L, n = 6L)
+
+dSum2dN(n = 6L)
 }
 \arguments{
 \item{f}{number of dice (integer, `f > 1`)}
@@ -22,7 +25,16 @@ Calculate the probability of rolling `n` dice with `f` faces.
 For two fair n-sided dice (faces 1..n),
 the sum distribution is triangular. The functions here have
 been tested in a value range of n ∊ [1, 100].
+
+For two fair n-sided dice (faces 1..n),
+the sum distribution is triangular.
 }
+\section{Functions}{
+\itemize{
+\item \code{dSum2dN()}: `sum2dN` is used for 2 dice because this
+method is a low more efficient.
+
+}}
 \examples{
 dSumFdN() # 2d6
 dSumFdN(4, 6) # 4d6

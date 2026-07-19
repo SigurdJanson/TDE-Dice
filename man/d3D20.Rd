@@ -33,6 +33,6 @@ of a 1 in that roll.
 
 \item \code{botch3d20()}: Distribution of botches
 in a 3d20 which are defined by at least two instances
-of a 1 in that roll.
+of a 20 in that roll.
 
 }}
