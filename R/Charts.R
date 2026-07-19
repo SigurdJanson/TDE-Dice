@@ -20,7 +20,7 @@ plotAttributeChecks <- function() {
   df$Outcome <- as.factor(df$Outcome)
   df$p <- df$p * 100
 
-  ggplot(df, aes(x = EAV, y = p, group=Outcome, color=Outcome)) +
+  ggplot(df, aes(x = EAV, y = p, group=Outcome, colour=Outcome)) +
     geom_point() +
     geom_line() +
     guides(color = guide_legend(title = "Outcome")) +
@@ -29,8 +29,11 @@ plotAttributeChecks <- function() {
     scale_x_continuous(breaks = seq(0, 25, by = 10)) +
     scale_y_continuous(breaks = seq(0, 100, by = 10),
                        labels = ylabels) +
-    xlab("Effective Attribute Value") +
-    ylab("Probability") +
+    labs(
+      x = "Effective Attribute Value",
+      y = "Probability",
+      title = "Probabilities of Attribute Check Outcomes"
+    ) +
     theme_minimal()
 }
 
