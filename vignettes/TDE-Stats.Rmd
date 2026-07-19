@@ -1,8 +1,8 @@
 ---
-title: "The Stats behind A Dark Eye"
+title: "The Stats behind The Dark Eye"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{The Stats behind A Dark Eye}
+  %\VignetteIndexEntry{The Stats behind The Dark Eye}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(TDEDice)
+library(ggplot2)
 ```
 
 
@@ -166,4 +167,206 @@ rm(result)
 
 These `r length(attrcount[attrcount$Freq == 1L, "Var1"])` combinations are used just once `r paste(attrcount[attrcount$Freq == 1L, "Var1"])`.
 
+
+
+## Skill Check Distributions
+
+### Background
+
+The starting point is the probability distribution for the sum of 3d20. The roughly bell-shaped form affects the logic. 
+
+```{r SumOf3d20, echo=FALSE, fig.width=6}
+df <- data.frame(
+  Probability = d3D20(),
+  DieRoll = 1:60L#,
+  #Compensation = factor(c(rep("No", 3*8L), rep("Yes", 3*12L)))
+)
+ggplot(df, aes(x=DieRoll, y=Probability)) + #, fill = Compensation
+  geom_col() +
+  labs(title = "Probabilities for the Sum of 3d20" ) + #, subtitle = SubTitle)
+  theme_minimal()
+```
+
+
+
+To approach the logic, let’s first assume that all three attributes have identical values. Let's say 8. This may rarely be the case in the game, but here it simplifies the logic enormously and makes it much easier to understand the principles behind DSA statistics. Why? When all 3 attributes are the same, we can simplify the calculation of the remaining skill points. We can compensate for a die roll that is higher than the corresponding attribute by using skill points. Now when all attributes have identical values, we can simply sum up all attributes for comparison. And we take the sum of the 3 die rolls except for one detail: every die roll lower than it's attribute uses the attribute value, otherwise we use the faces on the die. In code we use the sum of: `max(die, attribute)`. If we did not do that, A die roll below it's attribute would compensate die rolls above the attribute. But that does not happen in TDE.
+
+The resulting distribution looks like this (bar chart: attributes 8/8/8 + skill 7). The line in the foreground shows the probabilities of the sum of 3d20 for comparison.
+
+
+```{r echo=FALSE, fig.width=6}
+df <- data.frame(
+  p3d20 = d3D20(),
+  pMaxSum = dSkillPurged(1:60, rep(8L, 3L), 7L, "vector") +
+    crit3d20(rep(8L, 3L))/8000 + botch3d20(rep(8L, 3L))/8000,
+  DieRoll = 1:60L#,
+  #Compensation = factor(c(rep("No", 3*8L), rep("Yes", 3*12L)))
+)
+ggplot(df, aes(x=DieRoll, y=pMaxSum)) + #, fill = Compensation
+  geom_col(fill = "lightgray") +
+  geom_step(data = df, aes(x=DieRoll, y=p3d20), colour = "red") + 
+  labs(title = "", caption = "Outcomes of a folded 3d20 roll.") + #, subtitle = SubTitle)
+  theme_minimal()
+```
+
+
+
+
+```{r eval=FALSE, include=FALSE}
+plotSkillDistribution(dSkillPoints(0:10, c(7, 10, 13), 8, "df"), 9)
+```
+
+
+
+## Skill Check Difficulty
+
+Difficulty and quality are two different things, and yet, they are related. In many cases, we would assume that the need for a higher quality increases the challenge. But in the game, the game master would rarely add a penalty to a skill check **and** ask for a quality level above 1. That would mean increasing the challenge twice. Cases with a double challenge are magic spells that need to get through spirit (SPI) or toughness (TOU). The check is modified by the resistance of the target. Additionally, the quality level decides whether the spell is powerful enough to reach a desired goal, i.e. incapacitate the opponents, throw enough fire at them, or look into their minds long enough to gather important information.
+
+Another good example for the double challenge are competitive checks. A penalty on the hero's check still requires them to out-roll the opponent with a higher quality level.
+
+**Question**: what are the chances to reach a required quality level? Or in other words, when the game master requests a QL for success, how does it affect th character's performance? The following charts gives some answers. It shows the probability of each quality level depending on different configuration of attributes. To the right is the highest quality level. With a skill level of 18 that is QL6. But the curve of each single chart would not change much. The maximum QL on the right would roughly stay the same and we would lose the quality levels to the left when we reduce the character's skill level.
+
+```{r SkillCheckByQL, echo=FALSE, fig.height=5, fig.width=10}
+totalps <- NULL
+Conditions <- list(Low = rep(5, 3L), Med = rep(10, 3L), High = rep(15, 3L))
+# CREATE DATA FRAME
+for (eav in Conditions) {
+  print(names(eav))
+  for (skill in seq(9L, 18L, 3L)) {
+    for (mod in -1:1L) {
+      ps <- dql(1:6, eav + mod, skill, format = "df")
+      ps[ps[, "p"] == 0, "p"] <- NA_real_
+      ps$EAV <- paste0(eav+mod, collapse = "/")
+      ps$Skill <- skill
+      ps$EAVRange <- unique(eav)
+      ps$EAVMod <- mod
+      
+      totalps <- rbind(totalps, ps)
+    }
+  }
+}
+totalps$EAV <- ordered(totalps$EAV, levels=sapply(Conditions, \(x) paste0(x, collapse = "/")))
+totalps$Skill <- as.ordered(totalps$Skill)
+levels(totalps$QL) <- setNames(levels(totalps$QL), c("Failed", -5:-1, "Max"))
+
+ggplot(totalps, aes(x=QL, y=p, group = Skill, colour = Skill)) +
+  geom_line() + geom_point() +
+  scale_color_discrete() +
+  facet_grid(EAVRange ~ EAVMod, scales = "free_y") +
+  geom_text(aes(label = EAV),
+    x = -Inf, y = Inf,           # put text in top‑left corner
+    hjust = -0.1, vjust = 1.1, size = 3L) +
+  theme_minimal() |> 
+  suppressMessages()
+```
+
+The TDE rule system clearly favours high quality levels over lower ones. While low attributes offer higher chances for low quality levels, higher attributes have **higher** chances on the **higher** quality levels.
+
+Small variations have little effect on a character's success. A sequence such as 15/15/15 or 14/15/16 may be just as expensive to buy but it offer negligible advantages (not shown here). However, raising all attributes for a skill check by one has noteworthy effects on your chances.
+
+
+**Question**: how do "incomplete" quality levels affect the probabilities?
+
+When characters have skill points that can be divided by 3, they make the most of the highest skill level: that means they can use up to 2 skill points and they still get their maximum QL out of the check. That is the optimal case. How do chances change, when a character does not have 
+
+
+```{r SkillCheckByQL_7_16, echo=FALSE, fig.height=5, fig.width=10}
+totalps <- NULL
+Conditions <- list(Med = rep(10, 3L), High = rep(15, 3L))
+# CREATE DATA FRAME
+for (eav in Conditions) {
+  print(names(eav))
+  for (skill in seq(9L, 18L, 1L)) {
+    ps <- dql(1:6, eav, skill, format = "df")
+    ps[ps[, "p"] == 0, "p"] <- NA_real_
+    ps$EAV <- paste0(eav, collapse = "/")
+    ps$Skill <- skill
+    ps$EAVRange <- unique(eav)
+    ps$Surplus <- TDEDice:::binSkillPoints(skill)[[1L]]
+
+    totalps <- rbind(totalps, ps)
+  }
+}
+totalps$EAV <- ordered(totalps$EAV, levels=sapply(Conditions, \(x) paste0(x, collapse = "/")))
+totalps$Skill <- as.ordered(totalps$Skill)
+#totalps$Surplus <- as.ordered(totalps$Surplus)
+levels(totalps$QL) <- setNames(levels(totalps$QL), c("Failed", -5:-1, "Max"))
+
+ggplot(totalps, aes(x = QL, y = p, group = Skill, colour = Skill, linewidth = Surplus)) +
+  geom_line() + geom_point() +
+  scale_linewidth(range = c(0.2, 1.2), breaks = sort(unique(totalps$Surplus))) + # balance widths
+  scale_color_discrete() +
+  facet_wrap(vars(EAVRange)) + #, scales = "free_y"
+  geom_text(aes(label = EAV),
+    x = -Inf, y = Inf,           # put text in top‑left corner
+    hjust = -0.1, vjust = 1.1, size = 3L) +
+  theme_minimal() |> 
+  suppressMessages()
+```
+
+
+**Question**: how does an outlier in the attributes affect the chances?
+
+
+```{r SkillCheckByQL_Outliers, echo=FALSE, fig.height=5, fig.width=10}
+totalps <- NULL
+Conditions <- list(L = c(5, 5, 5), LO = c(5, 5, 10), LOO = c(5, 5, 15),  
+                   oM = c(10, 10, 5), M = c(10, 10, 10),  MO = c(10, 10, 15), 
+                   ooH = c(15, 15, 5), oH = c(15, 15, 10), H = c(15, 15, 15))
+# CREATE DATA FRAME
+for (eav in Conditions) {
+  for (skill in seq(9, 18, 3)) {
+    ps <- dql(1:6, eav, skill, format = "df")
+    ps[ps[, "p"] == 0, "p"] <- NA_real_
+    ps$EAV <- paste0(eav, collapse = "/")
+    ps$Skill <- skill
+    #ps$EAVMax <- max(eav)
+    #ps$Outlier <- 
+    totalps <- rbind(totalps, ps)
+  }
+}
+totalps$EAV <- ordered(totalps$EAV, levels=sapply(Conditions, \(x) paste0(x, collapse = "/")))
+totalps$Skill <- as.ordered(totalps$Skill)
+levels(totalps$QL) <- setNames(levels(totalps$QL), c("Failed", -5:-1, "Max"))
+
+# PLOT
+ggplot(totalps, aes(x=QL, y=p, group = Skill, colour = Skill)) +
+  geom_line() + geom_point() +
+  #scale_colour_manual(values = c("gray", "gray", "black")) +
+  scale_color_discrete() +
+  #ylim(0, 0.75) +
+  facet_wrap(~ EAV, ncol=3, scales = "free_y") +
+  theme_minimal()
+```
+
+**Question**: how does a penalty affect the probability of a skill check? From the previous charts we can already guess what will happen. Let us take a closer look at the following ones. Each chart shows a set of probabilities for a combination of attributes. Each data point shows the probability for a result of QL1 or higher.
+
+```{r SkillCheckByMod, echo=FALSE, fig.height=5, fig.width=10}
+totalps <- NULL
+Conditions <- list(A = rep(8, 3L), AM = 7:9, AD = c(8, 8, 15), 
+                   B = rep(11, 3L), BM = 10:12, BD = c(11, 11, 15), 
+                   C = rep(15, 3L), CM = 14:16, CD = c(15, 15, 8))
+skill <- 18
+
+for (eav in Conditions) {
+  for(mod in -5:0) {
+    ps <- pql(1, eav+mod, skill, lower.tail = FALSE, format = "df")
+    ps$EAV <- paste0(eav, collapse = "/")
+    ps$Mod <- mod
+    totalps <- rbind(totalps, ps)
+  }
+}
+totalps$EAV <- ordered(totalps$EAV, levels=sapply(Conditions, \(x) paste0(x, collapse = "/")))
+totalps$Skill <- skill
+totalps$Skill <- as.ordered(totalps$Skill)
+
+ggplot(totalps, aes(x=Mod, y=p, group = "black", colour = Skill)) +
+  geom_line() + geom_point() +
+  ylim(0, 1) + xlim(0, -5) +
+  facet_wrap(~ EAV, ncol=3) +
+  theme_minimal()
+```
+
+
+2. 
 
