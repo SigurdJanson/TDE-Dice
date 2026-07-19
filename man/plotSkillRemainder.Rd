@@ -3,11 +3,14 @@
 \name{plotSkillRemainder}
 \alias{plotSkillRemainder}
 \alias{plotSkillAggregateDies}
+\alias{plotSkillQL}
 \title{Skill Check Plots}
 \usage{
 plotSkillRemainder(eav, skill)
 
 plotSkillAggregateDies(eav, skill, add3d20 = FALSE)
+
+plotSkillQL(eav, skill)
 }
 \arguments{
 \item{eav}{A vector with three integers as effective attribute values.}
@@ -29,8 +32,11 @@ the x-axis with probabilities on y. Skill point remainders,
 \item \code{plotSkillAggregateDies()}: Plots the skill check probabilities (y-axis)
 as a function of aggregated die rolls (x-axis).
 
+\item \code{plotSkillQL()}: Plots probabilities of each quality level.
+
 }}
 \examples{
 plotSkillRemainder(c(7, 10, 13), 8)
 plotSkillAggregateDies(c(7, 10, 13), 8, TRUE)
+plotSkillQL(c(7, 10, 13), 8)
 }

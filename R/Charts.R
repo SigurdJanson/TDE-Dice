@@ -126,3 +126,34 @@ plotSkillAggregateDies <- function(eav, skill, add3d20 = FALSE) {
 
   return(pl)
 }
+
+
+#' @describeIn plotSkillRemainder Plots probabilities of each quality level.
+#' @export
+#' @examples
+#' plotSkillQL(c(7, 10, 13), 8)
+plotSkillQL <- function(eav, skill) {
+  require(ggplot2)
+  .Palette <- c("#999999FF", # FAIL
+                "#1B641B", "#269C29", "#33D23B", "#68E170", # QL1 - 4
+                "#9EEEA6", "#D7F9DB", "#EDFFDB") # QL 5 - 7
+  # DATA
+  ql <- qualityLevel(skill:0)
+  df <- dql(0:.maxql, eav, skill, "df")
+
+  Title <- "Probabilities of Remaining Skill Points"
+  SubTitle <- paste("EAV:", paste(eav, collapse="/"), paste("Skill:", skill))
+  Palette <- .Palette
+  ylabels <- \(x) paste(x, "%")
+
+  # PLOT
+  ggplot(df, aes(x=QL, y=p, fill = QL)) +
+    geom_col() +
+    scale_fill_manual(values = Palette) +
+    scale_y_continuous(labels = ylabels) +
+    labs(
+      x = "Quality Level", y = "Probability",
+      title = Title, subtitle = SubTitle) +
+      #, caption = "") +
+    theme_minimal()
+}
