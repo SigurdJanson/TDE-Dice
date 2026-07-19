@@ -58,20 +58,21 @@ plotSkillRemainder <- function(eav, skill) {
                 "#9EEEA6", "#D7F9DB", "#EDFFDB") # QL 5 - 7
 
   sp <- dSkillPoints(-1:skill, eav, skill, "df")
-  sp$QL <- qualityLevel(sp$Remainder) |> .qlfactor()
+  ql <- qualityLevel(sp$Remainder)
+  sp$QL <- ql |> .qlfactor()
 
   ylabels <- \(x) paste(x, "%")
   Title <- "Probabilities of Remaining Skill Points"
-  SubTitle <- paste("EAV:", paste(eav, sep="/"), paste("Skill:", skill))
+  SubTitle <- paste("EAV:", paste(eav, collapse="/"), paste("Skill:", skill))
   Palette <- .Palette[1L:(max(ql) + 1L)]
 
   ggplot(sp, aes(x = Remainder, y = p, fill = QL)) +
     geom_col() +
     scale_fill_manual(values = Palette) +
     scale_y_continuous(labels = ylabels) +
-    xlab("Skill Remainder") +
-    ylab("Probability") +
-    labs(title = Title, subtitle = SubTitle) +
+    labs(
+      x = "Skill Remainder", y = "Probability",
+      title = Title, subtitle = SubTitle) +
     theme_minimal()
 }
 
