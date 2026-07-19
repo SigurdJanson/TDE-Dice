@@ -2,14 +2,20 @@
 % Please edit documentation in R/Charts.R
 \name{plotSkillRemainder}
 \alias{plotSkillRemainder}
+\alias{plotSkillAggregateDies}
 \title{Skill Check Plots}
 \usage{
 plotSkillRemainder(eav, skill)
+
+plotSkillAggregateDies(eav, skill, add3d20 = FALSE)
 }
 \arguments{
 \item{eav}{A vector with three integers as effective attribute values.}
 
 \item{skill}{Skill level (integer, scalar)}
+
+\item{add3d20}{if `TRUE` the distribution of the sum of 3d20
+is added (logical, scalar)}
 }
 \value{
 A ggplot object
@@ -18,6 +24,13 @@ A ggplot object
 Plot the probabilities of a skill check. Outcomes are plotted on
 the x-axis with probabilities on y. Skill point remainders,
 }
+\section{Functions}{
+\itemize{
+\item \code{plotSkillAggregateDies()}: Plots the skill check probabilities (y-axis)
+as a function of aggregated die rolls (x-axis).
+
+}}
 \examples{
 plotSkillRemainder(c(7, 10, 13), 8)
+plotSkillAggregateDies(c(7, 10, 13), 8, TRUE)
 }

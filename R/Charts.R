@@ -76,3 +76,53 @@ plotSkillRemainder <- function(eav, skill) {
     theme_minimal()
 }
 
+
+
+#' @describeIn plotSkillRemainder Plots the skill check probabilities (y-axis)
+#' as a function of aggregated die rolls (x-axis).
+#' @param add3d20 if `TRUE` the distribution of the sum of 3d20
+#' is added (logical, scalar)
+#' @export
+#' @examples
+#' plotSkillAggregateDies(c(7, 10, 13), 8, TRUE)
+plotSkillAggregateDies <- function(eav, skill, add3d20 = FALSE) {
+  require(ggplot2)
+  .Palette <- c("#999999FF", # FAIL
+                "#1B641B", "#269C29", "#33D23B", "#68E170", # QL1 - 4
+                "#9EEEA6", "#D7F9DB", "#EDFFDB") # QL 5 - 7
+  # DATA
+  x <- 1:60L
+  ql <- TDEDice:::qualityLevel(skill:0)
+  xLenFails <- length(x) - (sum(eav) - 1L) - (skill + 1L)
+  df <- data.frame(
+    p3d20 = d3D20(x),
+    pMaxSum = dSkillPurged(1:60, eav, skill, "vector") +
+      crit3d20(eav)/8000 + botch3d20(eav)/8000,
+    DieRoll = x,
+    QL = c(Below = rep(0L, sum(eav)-1L), ql, rep(0L, xLenFails)) |>
+      TDEDice:::.qlfactor()
+  )
+
+  # CHART INFO
+  Title <- "Probabilities of Remaining Skill Points"
+  SubTitle <- paste("EAV:", paste(eav, collapse="/"), paste("Skill:", skill))
+  Palette <- .Palette[1L:(max(ql) + 1L)]
+  ylabels <- \(x) paste(x, "%")
+
+  # PLOT
+  pl <- ggplot(df, aes(x=DieRoll, y=pMaxSum, fill = QL)) +
+    geom_col() +
+    scale_fill_manual(values = Palette) +
+    scale_y_continuous(labels = ylabels) +
+    labs(
+      x = "Aggregated Dies", y = "Probability",
+      title = Title, subtitle = SubTitle,
+      caption = "Outcomes of a aggregated 3d20 roll projected to skill remainder.") +
+    theme_minimal()
+  if (isTRUE(add3d20)) {
+    pl <- pl +
+      geom_step(data = df, aes(x=DieRoll, y=p3d20), group = 1L, colour = "red")
+  }
+
+  return(pl)
+}
