@@ -92,7 +92,7 @@ plotSkillAggregateDies <- function(eav, skill, add3d20 = FALSE) {
                 "#9EEEA6", "#D7F9DB", "#EDFFDB") # QL 5 - 7
   # DATA
   x <- 1:60L
-  ql <- TDEDice:::qualityLevel(skill:0)
+  ql <- qualityLevel(skill:0)
   xLenFails <- length(x) - (sum(eav) - 1L) - (skill + 1L)
   df <- data.frame(
     p3d20 = d3D20(x),
