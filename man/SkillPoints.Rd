@@ -10,9 +10,9 @@
 \usage{
 dSkillPoints(x, eav, skill, format = c("vector", "df"))
 
-pSkillPoints(q, eav, skill, lower.tail = TRUE)
+pSkillPoints(q, eav, skill, lower.tail = TRUE, format = c("vector", "df"))
 
-qSkillPoints(p, eav, skill, lower.tail = TRUE)
+qSkillPoints(p, eav, skill, lower.tail = TRUE, format = c("vector", "df"))
 
 rSkillPoints(n, eav, skill)
 }

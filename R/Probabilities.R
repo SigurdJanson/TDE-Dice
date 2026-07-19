@@ -27,7 +27,7 @@ d3D20 <- function(x) {
 
   if (missing(x)) return(freq / 8000)
 
-  x[x < 3L | x > 60L] <- 1L # handle indices of p that are out of range
+  x[x < 3L | x > 60L] <- 1L # handle indices that are out of range, map to zero
   return(freq[x] / 8000)
 }
 
@@ -50,6 +50,8 @@ crit3d20 <- function(eav) {
 
   return(result)
 }
+
+
 
 #' @describeIn d3D20 Distribution of botches
 #' in a 3d20 which are defined by at least two instances
@@ -155,9 +157,10 @@ dSkillPurged <- function(x, eav, skill, format = c("vector", "df")) {
   # into one distributions
   distr <- convolveDice(rect1d20(eav[1]), rect1d20(eav[2]))
   distr <- convolveDice(distr, rect1d20(eav[3]))
+  # Remove criticals and botches from `distr`
+  distr <- distr - (crit3d20(eav) + botch3d20(eav))
+  # Convert frequencies to probabilities
   distr <- distr / totalEvents
-  # Remove criticals and botches from the distr.
-  distr <- distr - (crit3d20(eav) + botch3d20(eav)) / totalEvents
 
   # FORMAT OUTPUT
   if (format == "df") {
@@ -185,7 +188,7 @@ dSkillPurged <- function(x, eav, skill, format = c("vector", "df")) {
 }
 
 
-
+## SKILLPOINTS #####
 
 #' SkillPoints
 #'
@@ -226,6 +229,7 @@ dSkillPoints <- function(x, eav, skill, format = c("vector", "df")) {
 
   data <- dSkillPurged(NA, eav, skill, "df")
   sp <- aggregate(p ~ Remainder, data, sum)
+
   # Add botches to 0 remaining skill points
   if ( !(-1 %in% levels(sp$Remainder)) ) {
     sp$Remainder <- ordered(sp$Remainder, levels = c(-1, levels(sp$Remainder)))
@@ -235,29 +239,115 @@ dSkillPoints <- function(x, eav, skill, format = c("vector", "df")) {
     sp$Remainder[nrow(sp)] <- -1
     sp <- sp[order(sp$Remainder, decreasing=FALSE), ]
   }
+  ### TODO ####
   sp[sp$Remainder == -1, "p"] <- sp[sp$Remainder == -1, "p"] + .pSkillBotches
   sp[sp$Remainder == skill, "p"] <- sp[sp$Remainder == skill, "p"] + .pSkillCriticals
+  ### TODO END ####
 
-  # subset
-  xr <- sp$Remainder[x+2L] # roughly equal to sp$Remainder[sp$Remainder %in% x]
-  if (anyNA(xr)) { # additional levels beyond the skill level requested
-    # Make sure all 'x'  are in the data
-    template <- data.frame(Remainder = x)
-
-    sp_expanded <- merge(template, sp, by = "Remainder", all.x = TRUE)
-    sp_expanded$p[is.na(sp_expanded$p)] <- 0
-
-    sp <- sp_expanded[sp_expanded$Remainder == x, ]
-  }
+  # Subset: create a template data frame to ensure all requested
+  # x-values are present and missing values are explicitly 0.
+  template <- data.frame(Remainder = x)
+  sp <- merge(template, sp, by = "Remainder", all.x = TRUE)
+  sp$p[is.na(sp$p)] <- 0
 
   if (format == "df")
     return(sp)
   else {
-    # names
-    x <- ordered( x, levels = -1:max(x, skill), labels = c("Failed", 0:max(x, skill)) )
-    return(setNames(sp$p, x))
+    # Create labels mapping -1 to "Failed" and others to their numeric value
+    labels <- ifelse(sp$Remainder == -1, "Failed", as.character(sp$Remainder))
+    # res <- setNames(sp$p, labels)
+    # return(res)
+    return(setNames(sp$p, labels))
+  }
+}
+
+
+#' @rdname SkillPoints
+#' @export
+pSkillPoints <- function(q, eav, skill, lower.tail = TRUE, format = c("vector", "df")) {
+  format <- match.arg(format)
+  if (lower.tail)
+    select <- 0:max(q)
+  else
+    select <- 0:skill
+
+  dskill <- dSkillPoints(select, eav, skill, format = format)
+  if (format == "vector") {
+    if (lower.tail)
+      result <- cumsum(dskill) # cumsum preserves names
+    else
+      result <- rev(cumsum(rev(dskill)))
+    result <- result[q+1L]
+  } else if (format == "df") {
+    result <- dskill
+    if (lower.tail)
+      result$p <- cumsum(dskill$p) # cumsum preserves names
+    else
+      result$p <- rev(cumsum(rev(dskill$p)))
+    result <- result[q+1L,]
+  }
+  return(result)
+}
+
+
+
+#' @rdname SkillPoints
+#' @export
+qSkillPoints <- function(p, eav, skill, lower.tail = TRUE, format = c("vector", "df")) {
+  format <- match.arg(format)
+
+  # 1. Get full distribution
+  # We assume a range sufficient to cover all possible remainders (-1 to skill)
+  dskill <- dSkillPoints(-1:skill, eav, skill, format = "df")
+
+  # 2. Calculate CDF
+  if (lower.tail) {
+    dskill$cdf <- cumsum(dskill$p)
+  } else {
+    dskill$cdf <- cumsum(rev(dskill$p))
+    dskill <- dskill[order(dskill$Remainder), ]
   }
 
+  # 3. Find quantiles using findInterval
+  # findInterval returns the index of the first CDF value >= p
+  indices <- findInterval(p, dskill$cdf) + 1L
+  # Handle boundary condition where p is exactly 0
+  indices[p <= 0] <- 1L
+
+  # 4. Map back to Remainder values
+  quantiles <- dskill$Remainder[indices]
+
+  if (format == "df") {
+    return(data.frame(p = p, quantile = quantiles))
+  } else {
+    return(quantiles)
+  }
+}
+
+
+#' @rdname SkillPoints
+#' @export
+rSkillPoints <- function(n, eav, skill) {
+  # 1. Get the full discrete probability distribution
+  dist <- dSkillPoints(-1:skill, eav, skill, format = "df")
+
+  if (length(n) > 1L)
+    n <- length(n)
+  else if (length(n) == 0L || n == 0L)
+    return(integer())
+  else if (n < 0)
+    stop("'n' must be greater than 0")
+
+  # 2. Sample from the 'Remainder' outcomes based on their 'p' weights
+  # Replace = TRUE is required for random sampling from a discrete distribution
+  return(
+    sample(
+      x = dist$Remainder,
+      size = n,
+      replace = TRUE,
+      prob = dist$p
+    )
+  )
 }
 
 
@@ -411,6 +501,7 @@ rql <- function(n, eav, skill) {
 }
 
 
+## BRUTE FORCE #####
 
 
 #' The likelihood for the outcomes of a skill check.
