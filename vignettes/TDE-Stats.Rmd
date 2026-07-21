@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(TDEDice)
 library(ggplot2)
+source("v_helpers.R")
 ```
 
 
@@ -57,13 +58,10 @@ $$
 # Skill Checks
 
 ```{r SetupSkillBackground}
-
 library(formattable)
-
 library(jsonlite)
-.attrs <- jsonlite::read_json(r"{D:\Programmierung\R\DSA\TDE-Dice\vignettes\attributes_en.json}")$Entries
-dfattrs <- do.call(rbind, lapply(.attrs, as.data.frame))
-rownames(dfattrs) <- NULL  # Remove row names
+
+dfattrs <- getAttrs("attributes_en.json")
 
 .skills <- jsonlite::read_json(r"{D:\Programmierung\R\DSA\TDE-Dice\vignettes\skills_en.json}")$Entries
 dfskills <- do.call(rbind, lapply(.skills, as.data.frame))
@@ -100,7 +98,14 @@ Each of these `r eavcombis` combinations has a distinct probability distribution
 
 In total, there are `r length(.skills)` profane skills. Each skill requires 3 attributes for a check. Some attributes are needed more frequently for skill checks than others. The list shows how often an attribute is required in a skill check, with duplicate attributes in a single check counted twice.
 
-```{r AttrUsePerSKill, echo=FALSE}
+**Doubles**. In addition to the disproportionately frequent use of attributes, there is also a larger number of instances where the same attribute is used twice in a skill check.
+
+```{r fig.width=6, echo=FALSE}
+plotSkillFrequencies("skills_en.json")
+```
+
+
+```{r AttrUsePerSKill, eval=FALSE, include=FALSE}
 attrcount <- dfskills[, paste0("ab", 1:3)] |> 
   unlist() |>
   table() |> as.data.frame()
@@ -110,9 +115,8 @@ attrcount[, c("Var1", "Label", "Freq")] |>
   knitr::kable(col.names = c("Id", "Name", "Frequency"))
 ```
 
-**Doubles**. In addition to the disproportionately frequent use of attributes, there is also an increasing number of instances where the same attribute is used twice in a skill check.
 
-```{r AttrDoubleUsePerSkill, echo=FALSE}
+```{r AttrDoubleUsePerSkill, eval=FALSE, include=FALSE}
 attrcount <- dfskills[, paste0("ab", 1:3)]
 # Find doubles
 attrcount$doubles <- apply(attrcount, 1L, \(x) if (any(duplicated(x))) x[duplicated(x)] else NA_character_)
@@ -128,15 +132,24 @@ knitr::kable(attrcount, col.names = c("Combination", "Frequency"))
 
 The repeated use of a single attribute in one skill check raises the question which attribute is needed for the largest set of skill checks? The INT attribute has the widest coverage, closely followed by SGC.
 
-```{r MostUsedAttrAcrossSkill, echo=FALSE}
+```{r MostUsedAttrAcrossSkill, echo=FALSE, fig.width=6}
 attrcount <- dfskills[, paste0("ab", 1:3)]
 attrcount <- sapply(dfattrs$attrID, \(x) rowSums(attrcount[, paste0("ab", 1:3)] == x) > 0 |> sum())
 attrcount <- colSums(attrcount) |> as.data.frame()
+colnames(attrcount) <- "Count"
+attrcount$Attr <- rownames(attrcount) |>
+  factor(levels = paste0("ATTR_", 1:8), labels = dfattrs$shortname)
 
-rownames(attrcount) <- NULL
-attrcount$Name <- dfattrs$shortname
-attrcount[[1]] <- color_bar("lightgray")(attrcount[[1]])
-knitr::kable(attrcount[c(2, 1)], col.names = c("Name", "Frequency"))
+ggplot(attrcount, aes(x = Attr, y = Count)) +
+  geom_col() +
+  scale_x_discrete(drop = FALSE) +
+  labs(
+    title = "Skills using Attributes",
+    x = "Attribute",
+    y = "Number of Skills",
+    caption = "This chart counts doubles only once."
+  ) +
+  theme_minimal()
 ```
 
 
@@ -169,6 +182,28 @@ These `r length(attrcount[attrcount$Freq == 1L, "Var1"])` combinations are used 
 
 
 
+
+## Magic
+
+The situation is different for magic. Courage, sagacity, intuition and charisma are the most important skills. And there are few doubled attributes within the skill checks. Constitution is the most important one of the physical attributes.
+
+```{r ReadMagic, echo=FALSE, fig.width=6}
+plotSkillFrequencies("arcaneskills_en.json")
+```
+
+
+
+## Liturgies
+
+The situation is different for magic. Courage, sagacity, intuition and charisma are the most important skills. And there are few doubled attributes within the skill checks. Constitution is the most important one of the physical attributes.
+
+```{r ReadLiturgies, echo=FALSE, fig.width=6}
+plotSkillFrequencies("karmaskills_en.json")
+```
+
+
+
+
 ## Skill Check Distributions
 
 ### Background
@@ -195,18 +230,7 @@ The resulting distribution looks like this (bar chart: attributes 8/8/8 + skill 
 
 
 ```{r echo=FALSE, fig.width=6}
-df <- data.frame(
-  p3d20 = d3D20(),
-  pMaxSum = dSkillPurged(1:60, rep(8L, 3L), 7L, "vector") +
-    crit3d20(rep(8L, 3L))/8000 + botch3d20(rep(8L, 3L))/8000,
-  DieRoll = 1:60L#,
-  #Compensation = factor(c(rep("No", 3*8L), rep("Yes", 3*12L)))
-)
-ggplot(df, aes(x=DieRoll, y=pMaxSum)) + #, fill = Compensation
-  geom_col(fill = "lightgray") +
-  geom_step(data = df, aes(x=DieRoll, y=p3d20), colour = "red") + 
-  labs(title = "", caption = "Outcomes of a folded 3d20 roll.") + #, subtitle = SubTitle)
-  theme_minimal()
+plotSkillAggregateDies(rep(8L, 3L), 7L, TRUE)
 ```
 
 
@@ -289,7 +313,6 @@ for (eav in Conditions) {
 }
 totalps$EAV <- ordered(totalps$EAV, levels=sapply(Conditions, \(x) paste0(x, collapse = "/")))
 totalps$Skill <- as.ordered(totalps$Skill)
-#totalps$Surplus <- as.ordered(totalps$Surplus)
 levels(totalps$QL) <- setNames(levels(totalps$QL), c("Failed", -5:-1, "Max"))
 
 ggplot(totalps, aes(x = QL, y = p, group = Skill, colour = Skill, linewidth = Surplus)) +
@@ -346,21 +369,24 @@ totalps <- NULL
 Conditions <- list(A = rep(8, 3L), AM = 7:9, AD = c(8, 8, 15), 
                    B = rep(11, 3L), BM = 10:12, BD = c(11, 11, 15), 
                    C = rep(15, 3L), CM = 14:16, CD = c(15, 15, 8))
-skill <- 18
+skill <- c(0L, 3L, 6L, 9L, 12L, 15L)
 
 for (eav in Conditions) {
   for(mod in -5:0) {
-    ps <- pql(1, eav+mod, skill, lower.tail = FALSE, format = "df")
-    ps$EAV <- paste0(eav, collapse = "/")
-    ps$Mod <- mod
-    totalps <- rbind(totalps, ps)
+    for (s in skill) {
+      ps <- pql(1, eav+mod, s, lower.tail = FALSE, format = "df")
+      ps$EAV <- paste0(eav, collapse = "/")
+      ps$Mod <- mod
+      ps$Skill <- s
+      totalps <- rbind(totalps, ps)
+    }
   }
 }
 totalps$EAV <- ordered(totalps$EAV, levels=sapply(Conditions, \(x) paste0(x, collapse = "/")))
-totalps$Skill <- skill
+# totalps$Skill <- skill
 totalps$Skill <- as.ordered(totalps$Skill)
 
-ggplot(totalps, aes(x=Mod, y=p, group = "black", colour = Skill)) +
+ggplot(totalps, aes(x=Mod, y=p, colour = Skill)) + #, group = "black"
   geom_line() + geom_point() +
   ylim(0, 1) + xlim(0, -5) +
   facet_wrap(~ EAV, ncol=3) +
