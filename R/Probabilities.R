@@ -11,7 +11,8 @@ totalEvents <- 8000L # total number of events with 3d20
 #'
 #' The density function for rolling a sum of 3d20.
 #'
-#' @param x A vector of dice sums.
+#' @param x A vector of dice sums. If the parameter is missing or `NULL`,
+#' the function returns the complete distribution.
 #'
 #' @returns The vector of length 60 starts with index 1,
 #' Index 1 and 2 are both zero because 3d20 have a sum of
@@ -25,7 +26,7 @@ d3D20 <- function(x) {
             228, 210, 190, 171, 153, 136, 120, 105, 91, 78,
             66, 55, 45, 36, 28, 21, 15, 10, 6, 3, 1)
 
-  if (missing(x)) return(freq / 8000)
+  if (missing(x) || is.null(x)) return(freq / 8000)
 
   x[x < 3L | x > 60L] <- 1L # handle indices that are out of range, map to zero
   return(freq[x] / 8000)
@@ -36,7 +37,7 @@ d3D20 <- function(x) {
 #' of a 1 in that roll.
 #' @param eav effective attribute value
 #' @export
-crit3d20 <- function(eav) {
+crit3d20 <- function(x, eav) {
   partial <- function(aoi, alla) { # attribute of interest vs. all
     r <- c(rep(0, sum(alla)-1L), aoi, rep(1, 20-aoi), rep(0, 40))
     return(r[1:60])
@@ -48,7 +49,10 @@ crit3d20 <- function(eav) {
   }
   result[sum(eav)] <- result[sum(eav)] -2L
 
-  return(result)
+  if (missing(x) || is.null(x))
+    return(result)
+  else
+    return(result[x])
 }
 
 
@@ -58,7 +62,7 @@ crit3d20 <- function(eav) {
 #' of a 20 in that roll.
 #' @param eav effective attribute value
 #' @export
-botch3d20 <- function(eav) {
+botch3d20 <- function(x, eav) {
   partial <- function(aoi) { # attribute of interest vs. all
     r <- c(rep(0, 39+aoi), aoi, rep(1, 20-aoi))
     return(r[1:60])
@@ -70,7 +74,10 @@ botch3d20 <- function(eav) {
   }
   result[60L] <- result[60L] -2L
 
-  return(result)
+  if (missing(x) || is.null(x))
+    return(result)
+  else
+    return(result[x])
 }
 
 
@@ -158,7 +165,7 @@ dSkillPurged <- function(x, eav, skill, format = c("vector", "df")) {
   distr <- convolveDice(rect1d20(eav[1]), rect1d20(eav[2]))
   distr <- convolveDice(distr, rect1d20(eav[3]))
   # Remove criticals and botches from `distr`
-  distr <- distr - (crit3d20(eav) + botch3d20(eav))
+  distr <- distr - (crit3d20(eav=eav) + botch3d20(eav=eav))
   # Convert frequencies to probabilities
   distr <- distr / totalEvents
 
@@ -501,7 +508,7 @@ rql <- function(n, eav, skill) {
 }
 
 
-## BRUTE FORCE #####
+## BRUTE FORCE ALGORITHMS #####
 
 
 #' The likelihood for the outcomes of a skill check.

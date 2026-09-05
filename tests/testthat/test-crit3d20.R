@@ -2,7 +2,7 @@
 
 test_that("... sum is always 58 (with random input)", {
   expect_equal(
-    crit3d20(sample(20, 3, TRUE)) |>
+    crit3d20(eav = sample(20, 3, TRUE)) |>
       sum(),
     58
   )
@@ -10,21 +10,22 @@ test_that("... sum is always 58 (with random input)", {
 
 test_that("... length is always 60 (with random input)", {
   expect_equal(
-    crit3d20(sample(20, 3, TRUE)) |>
+    crit3d20(eav = sample(20, 3, TRUE)) |>
       length(),
     60
   )
 })
 
 
+test_that("x = lowest is always sum-2", {
+  eav = sample(20, 3, TRUE)
+  expect_equal(
+    crit3d20(eav = eav)[sum(eav)], sum(eav) - 2L
+  )
 
-# test_that("crit3d20(5, 10, 15)", {
-#   expected <- c(
-#     rep(0, 2), # skip the 1 and 2
-#
-#   )
-#   expect_equal(
-#     crit3d20(5, 10, 15),
-#     expected
-#   )
-# })
+  # test subsetting
+  expect_equal(
+    crit3d20(eav = eav)[sum(eav)], crit3d20(sum(eav), eav = eav)
+  )
+})
+

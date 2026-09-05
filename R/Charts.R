@@ -97,7 +97,7 @@ plotSkillAggregateDies <- function(eav, skill, add3d20 = FALSE) {
   df <- data.frame(
     p3d20 = d3D20(x),
     pMaxSum = dSkillPurged(1:60, eav, skill, "vector") +
-      crit3d20(eav)/8000 + botch3d20(eav)/8000,
+      crit3d20(eav=eav)/8000 + botch3d20(eav=eav)/8000,
     DieRoll = x,
     QL = c(Below = rep(0L, sum(eav)-1L), ql, rep(0L, xLenFails)) |>
       TDEDice:::.qlfactor()
