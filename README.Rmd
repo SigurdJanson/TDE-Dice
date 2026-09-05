@@ -41,7 +41,7 @@ Key features: statistics for attribute, skill, and combat checks.<br/>
   * `q...()` for quantile functions.
   * `r...()` random generation functions.
 * Functions to determine outcomes as success, fail, critical success, botch (with the name pattern `cSkill(...)`, `cAttr(...)` etc.).
-* Basic helper functions for dice rolls to support custom calculations and comparisons (`dSumKdN()`, `convolveDice()`, `qualityLevel()` etc.).
+* Basic helper functions for dice rolls to support custom calculations and comparisons (`dSumFdN()`, `convolveDice()`, `qualityLevel()` etc.).
 * Plotting function (`plotAttributeChecks()`, `plotSkillChecks()`) based on [qqplot2](https://ggplot2.tidyverse.org/) supported by extensions of the probability functions to generate data frames.
 
 

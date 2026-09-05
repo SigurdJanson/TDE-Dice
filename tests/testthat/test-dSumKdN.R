@@ -6,7 +6,7 @@ test_that("3d20", {
                 228, 210, 190, 171, 153, 136, 120, 105, 91, 78,
                 66, 55, 45, 36, 28, 21, 15, 10, 6, 3, 1) / 8000
   expect_equal(
-    dSumKdN(3, 20L),
+    dSumFdN(3, 20L),
     setNames(expected, 3:60)
   )
 })
@@ -18,7 +18,7 @@ test_that("2d20", {
                 4, 3.75, 3.5, 3.25, 3, 2.75, 2.5, 2.25,
                 2, 1.75, 1.5, 1.25, 1, 0.75, 0.5, 0.25) / 100
   expect_equal(
-    dSumKdN(2, 20L),
+    dSumFdN(2, 20L),
     setNames(expected, 2:40)
   )
 })
@@ -27,7 +27,7 @@ test_that("2d6", {
   expected <- c(1, 2, 3, 4, 5,
                 6, 5, 4, 3, 2, 1) / 36
   expect_equal(
-    dSumKdN(2, 6),
+    dSumFdN(2, 6),
     setNames(expected, 2:12)
   )
 })
@@ -35,7 +35,7 @@ test_that("2d6", {
 test_that("2d3", {
   expected <- c(1, 2, 3, 2, 1) / 9
   expect_equal(
-    dSumKdN(2, 3),
+    dSumFdN(2, 3),
     setNames(expected, 2:6)
   )
 })
@@ -51,7 +51,7 @@ test_that("2d13", {
                 2.36686390533, 1.77514792899, 1.18343195266,
                 0.591715976331 ) / 100
   expect_equal(
-    dSumKdN(2, 13),
+    dSumFdN(2, 13),
     setNames(expected, 2:26)
   )
 })
@@ -60,10 +60,10 @@ test_that("2d13", {
 #
 #
 #
-test_that("results of `dSumKdN` and dSum2dN are equal", {
+test_that("results of `dSumFdN` and dSum2dN are equal", {
   faces <- sample(99, 1) +1
   expect_equal(
-    dSumKdN(2, faces),
+    dSumFdN(2, faces),
     dSum2dN(faces)
   )
 })
@@ -74,21 +74,21 @@ test_that("results of `dSumKdN` and dSum2dN are equal", {
 #
 test_that("argument < 1 causes an exception", {
   expect_error(
-    dSumKdN(0, 2)
+    dSumFdN(0, 2)
   )
   expect_error(
-    dSumKdN(2, 0)
+    dSumFdN(2, 0)
   )
 })
 
 test_that("argument NULL causes an exception", {
   expect_error(
-    dSumKdN(NULL)
+    dSumFdN(NULL)
   )
 })
 
 test_that("argument NA causes an exception", {
   expect_error(
-    dSumKdN(NA)
+    dSumFdN(NA)
   )
 })

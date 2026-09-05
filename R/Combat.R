@@ -88,12 +88,12 @@ dhitpoints <- function(x, eav, w, bl = 20L) {
   stopifnot(`Requested quantiles outside range of distribution` =
               all(1 <= x) && all(x <= maxHP))
 
-  if (w["Count"] == 1)
+  if (w["Count"] == 1L)
     dhp <- rep(1/w["Faces"], w["Faces"])
-  else if (w["Count"] == 2)
+  else if (w["Count"] == 2L)
     dhp <- dSum2dN(w["Faces"]) # for efficiency reasons
   else
-    dhp <- dSumKdN(w["Count"], w["Faces"])
+    dhp <- dSumFdN(w["Count"], w["Faces"])
 
   eav <- min(eav, 20L)
   Critical = eav / 400.0 # probability of a critical success
