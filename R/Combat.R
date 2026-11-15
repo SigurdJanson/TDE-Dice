@@ -143,7 +143,7 @@ qhitpoints <- function(p, eav, w, bl = 20L, lower.tail = TRUE) {
   if (!lower.tail) {
     p <- 1 - p
   }
-
+  # TODO: Implement
 }
 
 
