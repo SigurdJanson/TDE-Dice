@@ -110,21 +110,39 @@ test_that("eav > 20 returns ", {
 })
 
 
-#
-# EXCEPTIONS
-#
-test_that("x = 0 i.e. lower than minimum hitpoints throws exception", {
-  skill <- sample(1:20, 1) # skill should not matter
+test_that("modifier that causes hit points of 0 and lower gives correct results", {
+  skill <- 10
+  result <- dhitpoints(0:6, skill, c(Count=1, Faces=6, Mod=-5))
+  pcrit <- (1/20 * 10/20)
+  p0 <- 0.5 + (0.5 * 5/6) # 50% are 0 hp because of failure; 5/6 of the success also
 
-  expect_error(
-    dhitpoints(0, skill, c(Count=1, Faces=2, Mod=1))
+  expect_equal(sum(result), 1.000)
+  expect_equal(
+    result,
+    c(p0, 0.5 * 1/6 - (pcrit * 1/6), pcrit * 1/6, rep(0.0, 4L)) |>
+      setNames(0:6)
   )
 })
 
-test_that("x > maximum hitpoints throws exception", {
+
+
+
+#
+# EXCEPTIONS
+#
+test_that("x = 0 i.e. lower than minimum hitpoints is valid", {
   skill <- sample(1:20, 1) # skill should not matter
 
-  expect_error(
-    dhitpoints((6+1)*2 + 1L, skill, c(Count=1, Faces=6, Mod=1))
+  expect_no_error(
+    result <- dhitpoints(0, skill, c(Count=1, Faces=2, Mod=1))
   )
+})
+
+test_that("x > maximum hitpoints is valid", {
+  skill <- sample(1:20, 1) # skill should not matter
+
+  expect_no_error(
+    result <- dhitpoints((6+1)*2 + 1L, skill, c(Count=1, Faces=6, Mod=1))
+  )
+  expect_equal(result, c(`15` = 0.0))
 })

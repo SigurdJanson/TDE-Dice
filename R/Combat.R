@@ -47,8 +47,6 @@ cCombat <- function(eav, bl = 20L) {
 }
 
 
-# TODO: add 0 hp to dhitpoints
-# TODO: handle weapons mod that lead to 0 hit points
 
 #' Hit point distribution
 #'
@@ -65,7 +63,7 @@ cCombat <- function(eav, bl = 20L) {
 #' function, `qhitpoints` gives the quantile function and
 #' `rhitpoints` generates random deviates.
 #'
-#' Throws en error when x is empty or outside
+#' The return vector is named with hit point values.
 #'
 #' @name HitPointDistribution
 #' @aliases DiscreteHitPoints
@@ -83,33 +81,84 @@ dhitpoints <- function(x, eav, w, bl = 20L) {
   if(length(x) == 0) return(numeric())
   stopifnot(`Only a single attack value is supported` = length(eav) == 1)
 
-  minHP <- .minHP(w["Count"], w["Mod"])
-  maxHP <- .maxHP(w["Count"], w["Faces"], w["Mod"])
-  stopifnot(`Requested quantiles outside range of distribution` =
-              all(1 <= x) && all(x <= maxHP))
-
-  if (w["Count"] == 1L)
-    dhp <- rep(1/w["Faces"], w["Faces"])
-  else if (w["Count"] == 2L)
-    dhp <- dSum2dN(w["Faces"]) # for efficiency reasons
-  else
-    dhp <- dSumFdN(w["Count"], w["Faces"])
-
+  # --- Calculate Attack Probabilities ---
   eav <- min(eav, 20L)
-  Critical = eav / 400.0 # probability of a critical success
-  Success = eav / 20 - Critical # probability of a regular success
+  p_crit <- eav / 400.0
+  p_success <- eav / 20.0 - p_crit
+  p_fail <- 1.0 - p_success - p_crit
+  
+  # Guard against floating point slight negatives
+  p_success <- max(0.0, p_success)
+  p_fail <- max(0.0, p_fail)
 
-  indices <- 1L:length(dhp)+minHP-1L
-  result <- numeric(maxHP)
-  result[indices] <- Success * dhp
-  result[indices * 2] <- result[indices * 2] + Critical * dhp
+  # --- Get Dice Distribution ---
+  if (w["Count"] == 1L) {
+    dhp <- rep(1/w["Faces"], w["Faces"])
+    dice_sums <- 1:w["Faces"]
+  } else if (w["Count"] == 2L) {
+    dhp <- dSum2dN(w["Faces"])
+    dice_sums <- 2:(2 * w["Faces"])
+  } else {
+    dhp <- dSumFdN(w["Count"], w["Faces"])
+    dice_sums <- w["Count"]:(w["Count"] * w["Faces"])
+  }
 
+  # --- Calculate HP Values ---
+  # Apply modifier
+  raw_hp <- dice_sums + w["Mod"]
+  
+  # Normal hit points (clamped to 0)
+  hp_normal <- pmax(0L, raw_hp)
+  
+  # Critical hit points (double raw, clamped to 0)
+  hp_critical <- pmax(0L, 2L * raw_hp)
+  
+  # Maximum possible HP in the distribution
+  max_hp <- max(hp_critical)
+  
+  # --- Build Probability Mass Function ---
+  # Vector index i corresponds to HP value (i-1)
+  pmass <- numeric(max_hp + 1L)
+  
+  # 1. Add Failure mass to HP = 0
+  pmass[1L] <- pmass[1L] + p_fail
+  
+  # 2. Add Success mass
+  # Using tabulate for efficiency if dhp is large, but loop is clear and safe for small dice
+  # idx_norm is 1-based index for hp_normal
+  idx_norm <- hp_normal + 1L
+  # Accumulate
+  for(i in seq_along(dhp)) {
+    pmass[idx_norm[i]] <- pmass[idx_norm[i]] + (p_success * dhp[i])
+  }
+  
+  # 3. Add Critical mass
+  idx_crit <- hp_critical + 1L
+  for(i in seq_along(dhp)) {
+    pmass[idx_crit[i]] <- pmass[idx_crit[i]] + (p_crit * dhp[i])
+  }
+  
+  # --- Extract Results for x ---
+  result <- numeric(length(x))
+  names(result) <- x
+  
+  # Identify valid x values (within support [0, max_hp])
+  valid <- (x >= 0) & (x <= max_hp)
+  
+  if(any(valid)) {
+    # Map x to 1-based index
+    indices <- x[valid] + 1L
+    result[valid] <- pmass[indices]
+  }
+  
+  # Values outside support remain 0
   return(
-    ifelse(result[x] > 0 & result[x] < 21, result[x], 0) |>
-      as.numeric() |>
+    result |> 
+      as.numeric() |> 
       setNames(x)
   )
 }
+
 
 #
 #' @rdname HitPointDistribution
