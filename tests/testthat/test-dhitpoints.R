@@ -23,6 +23,57 @@ test_that("AT10 1W3+0", {
   )
 })
 
+
+test_that("AT10 1W6+0", {
+  skill <- 10
+  expected <- c(0.5, 0.475 * rep(1/6, 6L), rep(0, 6L)) +
+    c(0, 0, 0.025, 0, 0.025, 0, 0.025, 0, 0.025, 0, 0.025, 0, 0.025) * 1/6
+
+  expect_equal(
+    dhitpoints(0:12, skill, c(Count=1, Faces=6, Mod=0)),
+    expected |>
+      setNames(0:12)
+  )
+})
+
+test_that("AT15 1W6+0", {
+  skill <- 15
+  expected <- c(0.25, 0.11875, 0.125, 0.11875, 0.125, 0.11875, 0.125, 0, 0.0062500000000000, 0, 0.0062500000000000, 0, 0.0062500000000000)
+
+  expect_equal(
+    dhitpoints(0:12, skill, c(Count=1, Faces=6, Mod=0)),
+    expected |>
+      setNames(0:12)
+  )
+})
+
+test_that("AT10 1W6+1/-1 - modifiers work", {
+  skill <- 10
+
+  ## 1W+1
+  expected <- c(0.5, 0, 0.475 * rep(1/6, 6L), rep(0, 7L)) +
+    c(0, 0, 0, 0, 0.025, 0, 0.025, 0, 0.025, 0, 0.025, 0, 0.025, 0, 0.025) * 1/6
+
+  expect_equal(
+    dhitpoints(0:14, skill, c(Count=1, Faces=6, Mod=1)),
+    expected |>
+      setNames(0:14)
+  )
+
+  ## 1W-1
+  expected <- c((0.5 + 0.475 * 1/6), 0.475 * rep(1/6, 5L), rep(0, 9L)) +
+    c(0, 0.025, 0, 0.025, 0, 0.025, 0, 0.025, 0, 0.025, 0, 0.025, 0, 0, 0) * 1/6
+  expected <- c(0.583333333333334 ,0.0791666666666668 ,0.0833333333333335 ,0.0791666666666668 ,0.0833333333333335 ,0.0791666666666668 ,0.00416666666666668 ,0 ,0.00416666666666668 ,0 ,0.00416666666666668 ,0 ,0 ,0 ,0)
+  expect_equal(
+    dhitpoints(0:14, skill, c(Count=1, Faces=6, Mod=-1)),
+    expected |>
+      setNames(0:14)
+  )
+
+})
+
+
+
 test_that("AT12 1W6+2", {
   skill <- 12
   critchance <- 0.05 * skill / 20
@@ -97,7 +148,7 @@ test_that("x = numeric(0) returns numeric(0)", {
   )
 })
 
-test_that("eav > 20 returns ", {
+test_that("eav > 20 returns same as eav = 20", {
   skill <- 21
 
   expect_no_error(
