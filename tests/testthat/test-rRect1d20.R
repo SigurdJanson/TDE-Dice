@@ -1,3 +1,8 @@
+# Detect if coverage analysis is running
+is_coverage <- identical(Sys.getenv("R_COVR"), "true")
+# Set iterations based on context
+iterations <- if (is_coverage) 1L else 5000L
+
 
 test_that("d20 with eav returns consistent results with a seed", {
   set.seed(123)
@@ -8,6 +13,8 @@ test_that("d20 with eav returns consistent results with a seed", {
 })
 
 test_that("outcomes are between eav and 20", {
+  iterations <- iterations / 25
+
   eav <- 5
   results <- replicate(200, rRect1d20(1, eav = eav))
 
@@ -23,13 +30,14 @@ test_that("outcomes are between eav and 20", {
 })
 
 test_that("d20 has the correct weighted distribution", {
+  iterations <- iterations
+
   eav <- 5
-  n <- 5000
-  rolls <- replicate(n, rRect1d20(1, eav = eav))
+  rolls <- replicate(iterations, rRect1d20(1, eav = eav))
 
   # The expected proportion for the eav is eav/20
   expected_p <- eav / 20
-  actual_p <- sum(rolls == eav) / n
+  actual_p <- sum(rolls == eav) / iterations
 
   # Allow for a 2% margin of error due to randomness
   expect_equal(actual_p, expected_p, tolerance = 0.02)

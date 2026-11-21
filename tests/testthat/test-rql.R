@@ -1,3 +1,7 @@
+# Detect if coverage analysis is running
+is_coverage <- identical(Sys.getenv("R_COVR"), "true")
+# Set iterations based on context
+iterations <- if (is_coverage) 1L else 5000L
 
 test_that("function returns consistent results with consistent seed", {
   eav <- sample(1:20, 3)
@@ -13,9 +17,11 @@ test_that("function returns consistent results with consistent seed", {
 
 
 test_that("outcomes are between 0 and 3", {
+  iterations <- iterations / 25
+
   eav <- sample(1:20, 3)
   skill <- sample(0:9, 1) # max skill points of 6 give 3 QL
-  results <- replicate(200, rql(13, eav, skill))
+  results <- replicate(iterations, rql(13, eav, skill))
 
   expect_true(all(results >= 0))
   expect_true(all(results <= 3))
@@ -23,9 +29,11 @@ test_that("outcomes are between 0 and 3", {
 
 
 test_that("outcomes are between 0 and 2", {
+  iterations <- iterations / 25
+
   eav <- sample(1:20, 3)
   skill <- sample(0:6, 1) # max skill points of 6 give 2 QL
-  results <- replicate(200, rql(13, eav, skill))
+  results <- replicate(iterations, rql(13, eav, skill))
 
   expect_true(all(results >= 0))
   expect_true(all(results <= 2))
@@ -33,11 +41,11 @@ test_that("outcomes are between 0 and 2", {
 
 
 test_that("rql() has the correct weighted distribution", {
-  n <- 7500
+  iterations <- iterations * 1.5
   eav <- c(5, 11, 17)
   skill <- 5
 
-  rolls <- replicate(n, rql(1, eav, skill))
+  rolls <- replicate(iterations, rql(1, eav, skill))
 
   # The expected proportion
   expectedQL2 <- 0.16075
@@ -47,7 +55,7 @@ test_that("rql() has the correct weighted distribution", {
 
   # Allow for a 2% margin of error due to randomness
   for (ql in 0:6) {
-    actualQL <- sum(rolls == ql) / n
+    actualQL <- sum(rolls == ql) / iterations
     tol <- ifelse(ql > 2, 0.0, 0.02)
     expect_equal(actualQL, expected[ql+1L], tolerance = tol, info = paste0("ql", ql))
   }
