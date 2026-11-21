@@ -51,10 +51,19 @@ test_that("x = numeric(0) returns numeric(0)", {
 
 test_that("x = NA returns NA", {
   skill <- sample(1:20, 1) # skill should not matter
+  weapon <- c(Count=1, Faces=6, Mod=1)
 
   expect_equal(
-    qhitpoints(NA, skill, c(Count=1, Faces=6, Mod=1)),
-    NA_real_
+    qhitpoints(NA, skill, weapon),
+    NA_integer_
+  )
+
+  p <- c(0.25, NA, 0.75, NA, 1)
+  expect_equal(
+    qhitpoints(p, skill, weapon),
+    c(qhitpoints(0.25, skill, weapon), NA_integer_,
+      qhitpoints(0.75, skill, weapon), NA_integer_,
+      qhitpoints(1, skill, weapon))
   )
 })
 

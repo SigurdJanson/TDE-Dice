@@ -212,6 +212,8 @@ qhitpoints <- function(p, eav, w, bl = 20L, lower.tail = TRUE) {
 
   # For each probability p, find the smallest HP value (x) where CDF(x) >= p
   q_vals <- sapply(p, \(pi) {
+    if (is.na(pi)) return(NA_integer_)
+
     idx <- which(cdf >= pi)[1]
     # Fallback to maxHP if floating point inaccuracies cause pi to slightly exceed the max CDF
     if (is.na(idx))
