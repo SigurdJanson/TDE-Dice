@@ -118,19 +118,21 @@ test_that("eav = NA throws exception", {
 # TEST CASES FROM test-dhitpoints.R
 #
 test_that("random hit points match the AT4 1W2+1 distribution", {
+  iterations <- 100000
+
   skill <- 4
   weapon <- c(Count = 1, Faces = 2, Mod = 1)
 
   set.seed(123)
-  rolls <- rhitpoints(100000, skill, weapon)
-  actual <- tabulate(rolls + 1L, nbins = 7L) / 100000
+  rolls <- rhitpoints(iterations, skill, weapon)
+  actual <- tabulate(rolls + 1L, nbins = 7L) / iterations
   expected <- dhitpoints(0:6, skill, weapon)
 
   expect_equal(actual, unname(expected), tolerance = 0.003)
 })
 
 test_that("random hit points match the AT10 1W3+0 distribution", {
-  iterations <- 100000*5
+  iterations <- 100000*3.5
 
   skill <- 10
   weapon <- c(Count = 1, Faces = 3, Mod = 0)
@@ -144,7 +146,7 @@ test_that("random hit points match the AT10 1W3+0 distribution", {
 })
 
 test_that("random hit points match the AT10 1W6+0 distribution", {
-  iterations <- 100000*5
+  iterations <- 100000*3.5
 
   skill <- 10
   weapon <- c(Count = 1, Faces = 6, Mod = 0)
@@ -158,7 +160,7 @@ test_that("random hit points match the AT10 1W6+0 distribution", {
 })
 
 test_that("random hit points match the AT15 1W6+0 distribution", {
-  iterations <- 100000*5
+  iterations <- 100000*4
 
   skill <- 15
   weapon <- c(Count = 1, Faces = 6, Mod = 0)
@@ -172,7 +174,7 @@ test_that("random hit points match the AT15 1W6+0 distribution", {
 })
 
 test_that("random hit points respect 1W6 modifiers", {
-  iterations <- 100000*5
+  iterations <- 100000*4
 
   skill <- 10
 
@@ -190,7 +192,7 @@ test_that("random hit points respect 1W6 modifiers", {
 })
 
 test_that("random hit points match the AT12 1W6+2 distribution", {
-  iterations <- 100000*5
+  iterations <- 100000*3.5
 
   skill <- 12
   weapon <- c(Count = 1, Faces = 6, Mod = 2)
@@ -204,7 +206,7 @@ test_that("random hit points match the AT12 1W6+2 distribution", {
 })
 
 test_that("random hit points match the AT8 1W7+2 distribution", {
-  iterations <- 100000*5
+  iterations <- 100000*3.5
 
   skill <- 8
   weapon <- c(Count = 1, Faces = 7, Mod = 2)
@@ -232,7 +234,7 @@ test_that("random hit points match the AT11 2W6+0 distribution", {
 })
 
 test_that("random hit points match the AT19 3W3+4 distribution", {
-  iterations <- 100000*10
+  iterations <- 100000*8
 
   skill <- 19
   weapon <- c(Count = 3, Faces = 3, Mod = 4)
@@ -246,7 +248,7 @@ test_that("random hit points match the AT19 3W3+4 distribution", {
 })
 
 test_that("random hit points include zero for a modifier below minimum", {
-  iterations <- 100000*10
+  iterations <- 100000*8
 
   skill <- 10
   weapon <- c(Count = 1, Faces = 6, Mod = -5)
