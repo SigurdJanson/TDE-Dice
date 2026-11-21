@@ -394,5 +394,19 @@ ggplot(totalps, aes(x=Mod, y=p, colour = Skill)) + #, group = "black"
 ```
 
 
-2. 
+## Implementation Details
 
+These rules apply to all probability functions of the pattern `d../q../p../r..`.
+
+- An argument `NA` for x, q, or p returns `NA`.
+- An empty vector for x, q, or p returns `numeric(0)`.
+
+For random function: when `length(n) > 1` , then `length(n)` is replaces `n` to determine the number of random numbers to return.
+
+
+
+## Useful Resources
+
+- [anydice.com](https://anydice.com/)
+- Dice RNG [$GENERATE-RANDOM.ORG](https://generate-random.org/dice-probability)
+- [DSA5 Probability Calculator](http://dsa5.mueller-kalthoff.com/)
