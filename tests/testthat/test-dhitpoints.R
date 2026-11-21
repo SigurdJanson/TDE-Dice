@@ -148,6 +148,16 @@ test_that("x = numeric(0) returns numeric(0)", {
   )
 })
 
+test_that("x = NA returns NA", {
+  skill <- sample(1:20, 1) # skill should not matter
+
+  expect_equal(
+    dhitpoints(NA, skill, c(Count=1, Faces=6, Mod=1)),
+    NA_real_
+  )
+})
+
+
 test_that("eav > 20 returns same as eav = 20", {
   skill <- 21
 

@@ -79,14 +79,15 @@ cCombat <- function(eav, bl = 20L) {
 #' dhitpoints(6, 12, c(Count=2, Faces=6, Mod=0))
 dhitpoints <- function(x, eav, w, bl = 20L) {
   if(length(x) == 0) return(numeric())
-  stopifnot(`Only a single attack value is supported` = length(eav) == 1)
+  if (anyNA(x)) return(NA_real_)
+  stopifnot(`Only a single combat skill 'eav' value is supported` = length(eav) == 1)
 
   # --- Calculate Attack Probabilities ---
   eav <- min(eav, 20L)
   p_crit <- eav / 400.0
   p_success <- eav / 20.0 - p_crit
   p_fail <- 1.0 - p_success - p_crit
-  
+
   # Guard against floating point slight negatives
   p_success <- max(0.0, p_success)
   p_fail <- max(0.0, p_fail)
@@ -106,23 +107,23 @@ dhitpoints <- function(x, eav, w, bl = 20L) {
   # --- Calculate HP Values ---
   # Apply modifier
   raw_hp <- dice_sums + w["Mod"]
-  
+
   # Normal hit points (clamped to 0)
   hp_normal <- pmax(0L, raw_hp)
-  
+
   # Critical hit points (double raw, clamped to 0)
   hp_critical <- pmax(0L, 2L * raw_hp)
-  
+
   # Maximum possible HP in the distribution
   max_hp <- max(hp_critical)
-  
+
   # --- Build Probability Mass Function ---
   # Vector index i corresponds to HP value (i-1)
   pmass <- numeric(max_hp + 1L)
-  
+
   # 1. Add Failure mass to HP = 0
   pmass[1L] <- pmass[1L] + p_fail
-  
+
   # 2. Add Success mass
   # Using tabulate for efficiency if dhp is large, but loop is clear and safe for small dice
   # idx_norm is 1-based index for hp_normal
@@ -131,68 +132,95 @@ dhitpoints <- function(x, eav, w, bl = 20L) {
   for(i in seq_along(dhp)) {
     pmass[idx_norm[i]] <- pmass[idx_norm[i]] + (p_success * dhp[i])
   }
-  
+
   # 3. Add Critical mass
   idx_crit <- hp_critical + 1L
   for(i in seq_along(dhp)) {
     pmass[idx_crit[i]] <- pmass[idx_crit[i]] + (p_crit * dhp[i])
   }
-  
+
   # --- Extract Results for x ---
   result <- numeric(length(x))
   names(result) <- x
-  
+
   # Identify valid x values (within support [0, max_hp])
   valid <- (x >= 0) & (x <= max_hp)
-  
+
   if(any(valid)) {
     # Map x to 1-based index
     indices <- x[valid] + 1L
     result[valid] <- pmass[indices]
   }
-  
+
   # Values outside support remain 0
   return(
-    result |> 
-      as.numeric() |> 
+    result |>
+      as.numeric() |>
       setNames(x)
   )
 }
 
 
-#
+
 #' @rdname HitPointDistribution
 #' @param lower.tail logical; if TRUE (default), probabilities are
 #' \eqn{X \le x}, otherwise, \eqn{X \ge x}.
 #' @export
 phitpoints <- function(q, eav, w, bl = 20L, lower.tail = TRUE) {
+  if(length(q) == 0) return(numeric())
+  if(anyNA(q)) return(NA_real_)
   maxHP <- .maxHP(w["Count"], w["Faces"], w["Mod"])
-  if (lower.tail)
-    select <- 1:max(q)
-  else
-    select <- 1:maxHP
 
+  if (lower.tail)
+    select <- 0:max(q)
+  else
+    select <- 0:maxHP
   dhp <- dhitpoints(select, eav, w, bl)
+
   if (lower.tail)
     php <- cumsum(dhp) # cumsum preserves names
   else
     php <- rev(cumsum(rev(dhp)))
-  return(php[q])
+
+  # Use as.character(q) to correctly subset by names, avoiding positional
+  # indexing issues (which would fail on 0 and shift the rest by 1)
+  return(php[as.character(q)])
 }
 
 
 #' @rdname HitPointDistribution
 #' @param p vector of probabilities.
+#' @export
 qhitpoints <- function(p, eav, w, bl = 20L, lower.tail = TRUE) {
-  stopifnot(`'eav' must be a scalar within 1-20` =
-              length(eav) == 1L, eav >= 1 && eav <= 20)
-  stopifnot(!is.null(p) && !is.na(p))
-  if (any(p < 0 | p > 1)) stop("p must be between 0 and 1")
+  # stopifnot(`'eav' must be a scalar within 1-20` =
+  #             length(eav) == 1L, eav >= 1 && eav <= 20)
+  stopifnot(!is.null(p))
+  if (any(p < 0 | p > 1, na.rm = TRUE))
+    stop("p must be between 0 and 1")
 
+  # If lower.tail is FALSE, we are looking for P(X >= x) <= p,
+  # which is equivalent to P(X < x) >= 1 - p.
   if (!lower.tail) {
     p <- 1 - p
   }
-  # TODO: Implement
+
+  maxHP <- .maxHP(w["Count"], w["Faces"], w["Mod"])
+  support <- 0:maxHP
+
+  # Compute the CDF for all possible values using the corrected phitpoints
+  cdf <- phitpoints(support, eav, w, bl, lower.tail = TRUE)
+
+  # For each probability p, find the smallest HP value (x) where CDF(x) >= p
+  q_vals <- sapply(p, \(pi) {
+    idx <- which(cdf >= pi)[1]
+    # Fallback to maxHP if floating point inaccuracies cause pi to slightly exceed the max CDF
+    if (is.na(idx))
+      maxHP
+    else
+      support[idx]
+  })
+
+  return(as.integer(q_vals))
 }
 
 
