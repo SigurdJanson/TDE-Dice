@@ -59,6 +59,14 @@ test_that("n = 0 returns an empty set", {
   weapon <- c(Count = sample(1:5, 1), Faces = sample(2:20, 1), Mod = sample(-5:5, 1))
   expect_equal(rhitpoints(0, 12, weapon), integer())
 })
+test_that("n = numeric(0) returns an empty set", {
+  weapon <- c(Count = 1, Faces = 6, Mod = 1)
+  expect_equal(rhitpoints(numeric(0), 12, weapon), integer())
+})
+test_that("n < 0 throws an exception", {
+  weapon <- c(Count = 1, Faces = 6, Mod = 1)
+  expect_error(rhitpoints(-1, 12, weapon))
+})
 test_that("length(n) > 1 , then length(n) is used for n", {
   weapon <- c(Count = sample(1:5, 1), Faces = sample(2:20, 1), Mod = sample(-5:5, 1))
   len <- sample(2:10, 1)
@@ -103,4 +111,150 @@ test_that("eav = NULL throws exception", {
 })
 test_that("eav = NA throws exception", {
   expect_error(rhitpoints(5, NA, weapon))
+})
+
+
+#
+# TEST CASES FROM test-dhitpoints.R
+#
+test_that("random hit points match the AT4 1W2+1 distribution", {
+  skill <- 4
+  weapon <- c(Count = 1, Faces = 2, Mod = 1)
+
+  set.seed(123)
+  rolls <- rhitpoints(100000, skill, weapon)
+  actual <- tabulate(rolls + 1L, nbins = 7L) / 100000
+  expected <- dhitpoints(0:6, skill, weapon)
+
+  expect_equal(actual, unname(expected), tolerance = 0.003)
+})
+
+test_that("random hit points match the AT10 1W3+0 distribution", {
+  iterations <- 100000*5
+
+  skill <- 10
+  weapon <- c(Count = 1, Faces = 3, Mod = 0)
+
+  set.seed(123)
+  rolls <- rhitpoints(iterations, skill, weapon)
+  actual <- tabulate(rolls + 1L, nbins = 7L) / iterations
+  expected <- dhitpoints(0:6, skill, weapon)
+
+  expect_equal(actual, unname(expected), tolerance = 0.003)
+})
+
+test_that("random hit points match the AT10 1W6+0 distribution", {
+  iterations <- 100000*5
+
+  skill <- 10
+  weapon <- c(Count = 1, Faces = 6, Mod = 0)
+
+  set.seed(123)
+  rolls <- rhitpoints(iterations, skill, weapon)
+  actual <- tabulate(rolls + 1L, nbins = 13L) / iterations
+  expected <- dhitpoints(0:12, skill, weapon)
+
+  expect_equal(actual, unname(expected), tolerance = 0.003)
+})
+
+test_that("random hit points match the AT15 1W6+0 distribution", {
+  iterations <- 100000*5
+
+  skill <- 15
+  weapon <- c(Count = 1, Faces = 6, Mod = 0)
+
+  set.seed(123)
+  rolls <- rhitpoints(iterations, skill, weapon)
+  actual <- tabulate(rolls + 1L, nbins = 13L) / iterations
+  expected <- dhitpoints(0:12, skill, weapon)
+
+  expect_equal(actual, unname(expected), tolerance = 0.003)
+})
+
+test_that("random hit points respect 1W6 modifiers", {
+  iterations <- 100000*5
+
+  skill <- 10
+
+  set.seed(123)
+  rolls <- rhitpoints(iterations, skill, c(Count = 1, Faces = 6, Mod = 1))
+  actual <- tabulate(rolls + 1L, nbins = 15L) / iterations
+  expected <- dhitpoints(0:14, skill, c(Count = 1, Faces = 6, Mod = 1))
+  expect_equal(actual, unname(expected), tolerance = 0.003)
+
+  set.seed(123)
+  rolls <- rhitpoints(iterations, skill, c(Count = 1, Faces = 6, Mod = -1))
+  actual <- tabulate(rolls + 1L, nbins = 15L) / iterations
+  expected <- dhitpoints(0:14, skill, c(Count = 1, Faces = 6, Mod = -1))
+  expect_equal(actual, unname(expected), tolerance = 0.003)
+})
+
+test_that("random hit points match the AT12 1W6+2 distribution", {
+  iterations <- 100000*5
+
+  skill <- 12
+  weapon <- c(Count = 1, Faces = 6, Mod = 2)
+
+  set.seed(123)
+  rolls <- rhitpoints(iterations, skill, weapon)
+  actual <- tabulate(rolls + 1L, nbins = 17L) / iterations
+  expected <- dhitpoints(0:16, skill, weapon)
+
+  expect_equal(actual, unname(expected), tolerance = 0.003)
+})
+
+test_that("random hit points match the AT8 1W7+2 distribution", {
+  iterations <- 100000*5
+
+  skill <- 8
+  weapon <- c(Count = 1, Faces = 7, Mod = 2)
+
+  set.seed(123)
+  rolls <- rhitpoints(iterations, skill, weapon)
+  actual <- tabulate(rolls + 1L, nbins = 19L) / iterations
+  expected <- dhitpoints(0:18, skill, weapon)
+
+  expect_equal(actual, unname(expected), tolerance = 0.003)
+})
+
+test_that("random hit points match the AT11 2W6+0 distribution", {
+  iterations <- 100000*5
+
+  skill <- 11
+  weapon <- c(Count = 2, Faces = 6, Mod = 0)
+
+  set.seed(123)
+  rolls <- rhitpoints(iterations, skill, weapon)
+  actual <- tabulate(rolls + 1L, nbins = 25L) / iterations
+  expected <- dhitpoints(0:24, skill, weapon)
+
+  expect_equal(actual, unname(expected), tolerance = 0.003)
+})
+
+test_that("random hit points match the AT19 3W3+4 distribution", {
+  iterations <- 100000*10
+
+  skill <- 19
+  weapon <- c(Count = 3, Faces = 3, Mod = 4)
+
+  set.seed(123)
+  rolls <- rhitpoints(iterations, skill, weapon)
+  actual <- tabulate(rolls + 1L, nbins = 27L) / iterations
+  expected <- dhitpoints(0:26, skill, weapon)
+
+  expect_equal(actual, unname(expected), tolerance = 0.003)
+})
+
+test_that("random hit points include zero for a modifier below minimum", {
+  iterations <- 100000*10
+
+  skill <- 10
+  weapon <- c(Count = 1, Faces = 6, Mod = -5)
+
+  set.seed(123)
+  rolls <- rhitpoints(iterations, skill, weapon)
+  actual <- tabulate(rolls + 1L, nbins = 7L) / iterations
+  expected <- dhitpoints(0:6, skill, weapon)
+
+  expect_equal(actual, unname(expected), tolerance = 0.003)
 })

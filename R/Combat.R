@@ -245,15 +245,8 @@ rhitpoints <- function(n, eav, w, bl = 20L) {
   else if (n < 0)
     stop("'n' must be greater than 0")
 
-  # variables
-  minHP <- .minHP(w["Count"], w["Mod"])
   maxHP <- .maxHP(w["Count"], w["Faces"], w["Mod"])
-  HP <- minHP:maxHP
-
-  # Logic
-  chances <- cCombat(eav, bl)
-  p <- dhitpoints(HP, eav, w, bl)
-  p <- c(chances$Fail + chances$Botch, p)
-  #DEBUG: if (length(c(0, HP)) != length(p)) stop(length(c(0, HP)), "!=", length(p))
-  sample(c(0, HP), n, replace=TRUE, prob = p)
+  support <- 0:maxHP
+  p <- dhitpoints(support, eav, w, bl)
+  sample(support, n, replace=TRUE, prob = p)
 }
