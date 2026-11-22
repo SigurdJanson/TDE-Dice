@@ -206,6 +206,11 @@ dSkillPurged <- function(x, eav, skill, format = c("vector", "df")) {
 #'
 #' @param x,q vector of quantiles, the number of skill points
 #' (integer, 0 <= x <= skill).
+#' @param specials Controls whether botches and critical checks are
+#'   subsumed into normal outcomes or returned as separate categories.
+#'   \code{"subsumed"} (default) adds botches to failures and criticals to
+#'   the maximum skill-point remainder. \code{"separate"} replaces those
+#'   entries with the categories \code{"Botch"} and \code{"Critical"}.
 #' @param p	vector of probabilities.
 #' @param n	number of observations. If `length(n) > 1`, the length
 #' is taken to be the number required.
@@ -228,44 +233,67 @@ dSkillPurged <- function(x, eav, skill, format = c("vector", "df")) {
 #'
 #' @examples
 #' dSkillPoints(0:6, c(9, 10, 11), 8)
-dSkillPoints <- function(x, eav, skill, format = c("vector", "df")) {
-  if (any(x < -1L))
-    stop("Skill points ('x') are greater than 0; use -1 for failures.")
+dSkillPoints <- function(x, eav, skill, format = c("vector", "df"),
+                         specials = c("subsumed", "separate")) {
   # Arguments will be validated by `dSkillPurged()`
   format <- match.arg(format)
+  specials <- match.arg(specials)
+  if (specials == "subsumed" && any(x < -1L))
+    stop("Skill points ('x') are greater than 0; use -1 for failures.")
+  if (specials == "separate" && is.numeric(x) &&
+      any(x < -2L | x > skill + 1L))
+    stop("In separate mode, use -2 for botches, -1 for failures, 0:skill for skill points, and skill + 1 for criticals.")
 
   data <- dSkillPurged(NA, eav, skill, "df")
   sp <- aggregate(p ~ Remainder, data, sum)
 
-  # Add botches to 0 remaining skill points
-  if ( !(-1 %in% levels(sp$Remainder)) ) {
+  if (!(-1 %in% levels(sp$Remainder))) {
     sp$Remainder <- ordered(sp$Remainder, levels = c(-1, levels(sp$Remainder)))
-    # TODO: Insert p=0 as first row
     sp[nrow(sp) + 1L,] <- c(NA, NA)
     sp$p[nrow(sp)] <- 0
     sp$Remainder[nrow(sp)] <- -1
     sp <- sp[order(sp$Remainder, decreasing=FALSE), ]
   }
-  ### TODO ####
-  sp[sp$Remainder == -1, "p"] <- sp[sp$Remainder == -1, "p"] + .pSkillBotches
-  sp[sp$Remainder == skill, "p"] <- sp[sp$Remainder == skill, "p"] + .pSkillCriticals
-  ### TODO END ####
 
-  # Subset: create a template data frame to ensure all requested
-  # x-values are present and missing values are explicitly 0.
-  template <- data.frame(Remainder = x)
+  if (specials == "subsumed") {
+    sp[sp$Remainder == -1, "p"] <- sp[sp$Remainder == -1, "p"] + .pSkillBotches
+    sp[sp$Remainder == skill, "p"] <- sp[sp$Remainder == skill, "p"] + .pSkillCriticals
+
+    template <- data.frame(Remainder = x)
+    sp <- merge(template, sp, by = "Remainder", all.x = TRUE)
+    sp$p[is.na(sp$p)] <- 0
+
+    if (format == "df")
+      return(sp)
+
+    labels <- ifelse(sp$Remainder == -1, "Failed", as.character(sp$Remainder))
+    return(setNames(sp$p, labels))
+  }
+
+  sp$Remainder <- as.character(sp$Remainder)
+  sp$Remainder[sp$Remainder == "-1"] <- "Failed"
+  sp <- rbind(
+    data.frame(Remainder = "Botch", p = .pSkillBotches),
+    sp,
+    data.frame(Remainder = "Critical", p = .pSkillCriticals)
+  )
+
+  category_names <- c("Botch", "Failed", as.character(0:skill), "Critical")
+  template_names <- as.character(x)
+  template_names[template_names == "-2"] <- "Botch"
+  template_names[template_names == "-1"] <- "Failed"
+  template_names[template_names == as.character(skill + 1L)] <- "Critical"
+
+  template <- data.frame(Remainder = template_names)
   sp <- merge(template, sp, by = "Remainder", all.x = TRUE)
   sp$p[is.na(sp$p)] <- 0
+  sp$Remainder <- factor(sp$Remainder, levels = category_names, ordered = TRUE)
+  sp <- sp[order(sp$Remainder),]
 
   if (format == "df")
     return(sp)
-  else {
-    # Create labels mapping -1 to "Failed" and others to their numeric value
-    labels <- ifelse(sp$Remainder == -1, "Failed", as.character(sp$Remainder))
-    # res <- setNames(sp$p, labels)
-    # return(res)
-    return(setNames(sp$p, labels))
-  }
+
+  setNames(sp$p, as.character(sp$Remainder))
 }
 
 

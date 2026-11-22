@@ -110,6 +110,32 @@ test_that("sum is always 1", {
 })
 
 
+test_that("dSkillPoints separate mode exposes botches and criticals", {
+  eav <- c(10L, 10L, 10L)
+  skill <- 2L
+
+  result <- dSkillPoints(c(-2, -1, 0:2, 3),
+                         eav, skill, specials = "separate")
+
+  expect_equal(names(result),
+               c("Botch", "Failed", "0", "1", "2", "Critical"))
+  expect_equal(result[["Botch"]], 58 / 8000)
+  expect_equal(result[["Critical"]], 58 / 8000)
+  expect_equal(sum(result), 1)
+})
+
+
+test_that("dSkillPoints separate mode supports df format", {
+  result <- dSkillPoints(c("Botch", "Failed", "0", "Critical"),
+                         c(10L, 10L, 10L), 2L,
+                         format = "df", specials = "separate")
+
+  expect_equal(as.character(result$Remainder),
+               c("Botch", "Failed", "0", "Critical"))
+  expect_equal(result$p[result$Remainder == "Botch"], 58 / 8000)
+})
+
+
 #
 # FORMAT CONSISTENCY ####
 #
