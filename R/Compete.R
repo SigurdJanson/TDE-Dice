@@ -260,3 +260,51 @@ pCompete <- function(q, dfun, x, aArgs = NULL, pArgs = NULL, ties = TRUE,
 
 
 
+
+
+#' Random Generation for the Difference Between Two Independent Discrete
+#' Random Variables
+#'
+#' @description
+#' Generates random observations from the difference distribution
+#' \eqn{D = X - Y}, where \eqn{X} and \eqn{Y} are independent discrete
+#' random variables. The distribution is obtained with \code{\link{dCompete}}.
+#'
+#' @param n Number of observations. If \code{length(n) > 1}, the length of
+#'   \code{n} determines the number of observations.
+#' @inheritParams dCompete
+#'
+#' @return A numeric vector containing generated difference values.
+#'
+#' @seealso
+#' \code{\link{dCompete}} for the difference probability mass function,
+#' \code{\link{pCompete}} for the distribution function,
+#' \code{\link{qCompete}} for the quantile function.
+#'
+#' @family compete
+#'
+#' @examples
+#' dCoins <- \(x) ifelse(x == 1, 0.5, ifelse(x == 2, 0.5, 0))
+#'
+#' rCompete(10, dCoins, 0:3)
+#'
+#' @export
+rCompete <- function(n, dfun, x, aArgs = NULL, pArgs = NULL, ties = TRUE) {
+  if (length(n) > 1L)
+    n <- length(n)
+  else if (length(n) == 0L || n == 0L)
+    return(numeric())
+  else if (n < 0)
+    stop("'n' must be greater than or equal to 0")
+  else if (!is.finite(n) || n != as.integer(n))
+    stop("'n' must be a non-negative integer")
+
+  probs <- dCompete(dfun, x, aArgs, pArgs, ties)
+  if (length(probs) == 1L && is.na(probs))
+    return(rep(NA_real_, n))
+
+  differences <- as.numeric(names(probs))
+  sample(differences, size = n, replace = TRUE, prob = probs)
+}
+
+
