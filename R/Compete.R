@@ -94,3 +94,110 @@ cCompete <- function(dfun, x, aArgs = NULL, pArgs = NULL, ties = TRUE) {
 }
 
 
+
+##
+## COMPETITION CHECK: DIFFERENCE SCORE ####
+##
+
+
+
+#' Compute the Probability Distribution of the Difference Between Two
+#' Independent Discrete Random Variables
+#'
+#' @description
+#' Given two independent discrete random variables
+#' \eqn{X \sim \text{Dist}(\theta_A)}{X ~ Dist(theta_A)} and
+#' \eqn{Y \sim \text{Dist}(\theta_B)}{Y ~ Dist(theta_B)},
+#' this function computes the full probability mass function of their
+#' difference \eqn{D = X - Y}{D = X - Y}.
+#'
+#' Mathematically, for each possible difference \eqn{d}:
+#' \deqn{P(D = d) = \sum_{x} P(X = x) \cdot P(Y = x - d)}{
+#'   P(D = d) = sum_x P(X = x) * P(Y = x - d)}
+#'
+#' This is equivalent to the discrete convolution of the PMF of \eqn{X}
+#' with the reversed PMF of \eqn{Y}.
+#' When `ties = FALSE`, probability mass at a difference of zero is moved
+#' to a difference of negative one, counting ties as wins for the passive
+#' opponent.
+#'
+#' @param dfun A density function for a discrete distribution
+#'   (e.g., \code{\link{dql}}, \code{\link[stats]{dbinom}}, \code{\link[stats]{dpois}},
+#'   \code{\link[stats]{dnbinom}}). It must accept a vector of integer
+#'   values as its first argument and return a numeric vector of
+#'   probabilities of the same length.
+#' @param x A numeric vector of integer values defining the supported range
+#'   over which the PMFs are evaluated. For unbounded distributions
+#'   (e.g., Poisson), this should be a sufficiently wide truncation
+#'   (e.g., \code{0:50}) such that the omitted tail probability is
+#'   negligible.
+#' @param aArgs A named list of parameters passed to \code{dfun} for
+#'   distribution A (e.g., \code{list(size = 10, prob = 0.5)}).
+#' @param pArgs A named list of parameters passed to \code{dfun} for
+#'   distribution B.
+#' @inheritParams cCompete ties
+#'
+#' @return A named numeric vector of probabilities, where each element
+#'   corresponds to a possible value of \eqn{D = X - Y}. The names are
+#'   the integer difference values (as character strings), and the vector
+#'   is sorted in ascending order of these values. Returns \code{NA} if
+#'   invalid parameters are supplied.
+#'
+#' @seealso
+#' \code{\link{cCompete}} to summarize the three-way outcome
+#' (A wins / Tie / P wins).
+#'
+#' @family compete
+#'
+#' @examples
+#' # Binomial(10, 0.5) vs Binomial(10, 0.5)
+#' dCompete(
+#'   dfun = dbinom,
+#'   x  = 0:10,
+#'   aArgs = list(size = 10, prob = 0.5),
+#'   pArgs = list(size = 10, prob = 0.5)
+#' )
+#'
+#' # Poisson(5) vs Poisson(3)
+#' dCompete(
+#'   dfun = dpois,
+#'   x  = 0:30,
+#'   aArgs = list(lambda = 5),
+#'   pArgs = list(lambda = 3)
+#' )
+#'
+#' @export
+dCompete <- function(dfun, x, aArgs = NULL, pArgs = NULL, ties = TRUE) {
+  # Compute PMFs for both distributions
+  pA <- do.call(dfun, c(list(x), aArgs))
+  pB <- do.call(dfun, c(list(x), pArgs))
+
+  # Validate inputs (return NA for invalid parameters)
+  if (any(is.na(pA)) || any(is.na(pB)) ||
+      any(pA < 0) || any(pB < 0)) {
+    return(NA_real_)
+  }
+
+  # Compute all pairwise differences: support_A - support_P
+  diffs <- outer(x, x, "-")
+  if (!ties)
+    diffs[diffs == 0] <- -1
+
+  # Joint probabilities: P(X = a, Y = p) = P(X = a) * P(Y = p)
+  probs <- outer(pA, pB)
+
+  # Aggregate: sum probabilities for each unique difference value
+  diff_table <- tapply(as.vector(probs), as.vector(diffs), sum)
+  if (!ties) {
+    if (!("-1" %in% names(diff_table)))
+      diff_table <- c(diff_table, "-1" = 0)
+    diff_table <- c(diff_table, "0" = 0)
+  }
+
+  # Return as named numeric vector, sorted by difference value
+  result <- as.numeric(diff_table)
+  names(result) <- as.numeric(names(diff_table))
+  result[order(as.numeric(names(result)))]
+}
+
+
