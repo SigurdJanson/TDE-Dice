@@ -169,6 +169,8 @@ dhitpoints <- function(x, eav, w, bl = 20L) {
 phitpoints <- function(q, eav, w, bl = 20L, lower.tail = TRUE) {
   if(length(q) == 0) return(numeric())
   if(anyNA(q)) return(NA_real_)
+  stopifnot(is.logical(lower.tail), length(lower.tail) == 1L, !is.na(lower.tail))
+
   maxHP <- .maxHP(w["Count"], w["Faces"], w["Mod"])
 
   if (lower.tail)
@@ -195,6 +197,7 @@ qhitpoints <- function(p, eav, w, bl = 20L, lower.tail = TRUE) {
   # stopifnot(`'eav' must be a scalar within 1-20` =
   #             length(eav) == 1L, eav >= 1 && eav <= 20)
   stopifnot(!is.null(p))
+  stopifnot(is.logical(lower.tail), length(lower.tail) == 1L, !is.na(lower.tail))
   if (any(p < 0 | p > 1, na.rm = TRUE))
     stop("p must be between 0 and 1")
 

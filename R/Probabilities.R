@@ -305,6 +305,7 @@ pSkillPoints <- function(q, eav, skill, lower.tail = TRUE, format = c("vector", 
     select <- 0:max(q)
   else
     select <- 0:skill
+  stopifnot(is.logical(lower.tail), length(lower.tail) == 1L, !is.na(lower.tail))
 
   dskill <- dSkillPoints(select, eav, skill, format = format)
   if (format == "vector") {
@@ -330,6 +331,7 @@ pSkillPoints <- function(q, eav, skill, lower.tail = TRUE, format = c("vector", 
 #' @export
 qSkillPoints <- function(p, eav, skill, lower.tail = TRUE, format = c("vector", "df")) {
   format <- match.arg(format)
+  stopifnot(is.logical(lower.tail), length(lower.tail) == 1L, !is.na(lower.tail))
 
   # 1. Get full distribution
   # We assume a range sufficient to cover all possible remainders (-1 to skill)
@@ -469,6 +471,7 @@ dql <- function(x, eav, skill, format = c("vector", "df")) {
 #' @rdname QualityLevels
 #' @export
 pql <- function(q, eav, skill, lower.tail = TRUE, format = c("vector", "df")) {
+  stopifnot(is.logical(lower.tail), length(lower.tail) == 1L, !is.na(lower.tail))
   format <- match.arg(format)
   if (lower.tail)
     select <- 0:max(q)
@@ -497,6 +500,7 @@ pql <- function(q, eav, skill, lower.tail = TRUE, format = c("vector", "df")) {
 #' @rdname QualityLevels
 #' @export
 qql <- function(p, eav, skill, lower.tail = TRUE, format = c("vector", "df")) {
+  # note: lower.tail validation is done by `pql`
   stopifnot(!is.null(p) && !anyNA(p))
   if (any(p < 0 | p > 1)) stop("p must be between 0 and 1")
 
