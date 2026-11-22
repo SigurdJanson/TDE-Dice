@@ -201,3 +201,62 @@ dCompete <- function(dfun, x, aArgs = NULL, pArgs = NULL, ties = TRUE) {
 }
 
 
+
+
+#' Distribution Function for the Difference Between Two Independent Discrete
+#' Random Variables
+#'
+#' @description
+#' Computes the cumulative probability distribution of
+#' \eqn{D = X - Y}, where \eqn{X} and \eqn{Y} are independent discrete
+#' random variables. The distribution is obtained with \code{\link{dCompete}}.
+#'
+#' @param q A numeric vector of quantiles.
+#' @inheritParams dCompete
+#' @param lower.tail Logical; if \code{TRUE} (default), probabilities are
+#'   \eqn{P(D \le q)}. If \code{FALSE}, probabilities are \eqn{P(D > q)}.
+#'
+#' @return A numeric vector of cumulative probabilities.
+#'
+#' @seealso
+#' \code{\link{dCompete}} for the difference probability mass function,
+#' \code{\link{qCompete}} for the quantile function.
+#'
+#' @family compete
+#'
+#' @examples
+#' dCoins <- \(x) ifelse(x == 1, 0.5, ifelse(x == 2, 0.5, 0))
+#'
+#' pCompete(c(-1, 0, 1), dCoins, 0:3)
+#'
+#' @export
+pCompete <- function(q, dfun, x, aArgs = NULL, pArgs = NULL, ties = TRUE,
+                     lower.tail = TRUE) {
+  stopifnot(!is.null(q), is.numeric(q), !anyNA(q))
+  stopifnot(is.logical(lower.tail), length(lower.tail) == 1L, !is.na(lower.tail))
+
+  probs <- dCompete(dfun, x, aArgs, pArgs, ties)
+  if (length(probs) == 1L && is.na(probs))
+    return(rep(NA_real_, length(q)))
+
+  differences <- as.numeric(names(probs))
+  cdf <- cumsum(probs)
+
+  vapply(q, function(value) {
+    if (value < differences[1L])
+      lower_probability <- 0
+    else if (value >= differences[length(differences)])
+      lower_probability <- 1
+    else
+      lower_probability <- cdf[match(TRUE, differences > value) - 1L]
+
+    if (lower.tail)
+      lower_probability
+    else
+      1 - lower_probability
+  }, numeric(1L))
+}
+
+
+
+
