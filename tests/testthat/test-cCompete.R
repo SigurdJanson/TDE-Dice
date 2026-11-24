@@ -14,7 +14,7 @@ test_that("Degenerate/equality case yields 100% ties", {
   dFixed <- \(x) ifelse(x==1, 1, 0)
 
   result <- cCompete(dfun = dFixed, x = 0:5)
-  expect_equal(c(aWins = 0.0, Tie = 1.0, pWins = 0.0), result)
+  expect_equal(result, c(aWins = 0.0, Tie = 1.0, pWins = 0.0))
 
   result <- cCompete(dfun = dFixed, x  = 0:10, ties = FALSE)
   expect_equal(result, c(aWins = 0.0, Tie = 0.0, pWins = 1.0))
