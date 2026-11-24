@@ -10,11 +10,11 @@
 TDE-Dice brings the elegant probability mechanics of Germany’s legendary
 RPG [“Das Schwarze
 Auge”](https://ulisses-spiele.de/game-system/das-schwarze-auge/) ([The
-Dark Eye]()<https://ulisses-us.com/games/tde/>) into
-(R)\[<https://www.r-project.org/>\]. Calculate exact success
-probabilities for attribute checks, combat manoeuvres, and skill
-checks—no more guessing whether your hero can scale that castle wall or
-parry the orc chieftain’s axe!
+Dark Eye](https://ulisses-us.com/games/tde/) into
+[R](https://www.r-project.org/). Calculate exact success probabilities
+for attribute checks, combat manoeuvres, and skill checks—no more
+guessing whether your hero can scale that castle wall or parry the orc
+chieftain’s axe!
 
 Perfect for: \* Game Masters designing balanced encounters \*
 Statisticians exploring non-standard dice distributions \* Players
@@ -81,7 +81,7 @@ cAttr(14)
 # How good is this weapon? What are the chances of a 
 # weapon hitting an opponent with a certain number of 
 # hit points, excluding their defence?
-dhitpoints(2:12, eav=12, w = c(Count=2, Dice=6, Mod=0))
+dhitpoints(2:12, eav=12, w = c(Count=2, Faces=6, Mod=0))
 #>          2          3          4          5          6          7          8 
 #> 0.01583333 0.03166667 0.04833333 0.06333333 0.08083333 0.09500000 0.08166667 
 #>          9         10         11         12 
